@@ -44,7 +44,7 @@ chatbot-zapopan/
 
 **Configurar Secrets (Advanced settings → Secrets):**
 ```toml
-GOOGLE_API_KEY = "AIzaSyAorC3CFB4W5N2N8YLrAVOpOahLzNWFxRs"
+GOOGLE_API_KEY = "REPLACE_WITH_YOUR_API_KEY"
 
 # Opcional: Configuración para Google Sheets (modo producción)
 # GOOGLE_SHEETS_CREDENTIALS_JSON = "{\"type\": \"service_account\", ...}"
