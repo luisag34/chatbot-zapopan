@@ -1,0 +1,4 @@
+.streamlit/secrets.toml
+__pycache__/
+log_consultas.jsonl
+consultas_demo.csv
