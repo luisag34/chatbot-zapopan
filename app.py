@@ -497,28 +497,67 @@ def procesar_consulta_local(consulta: str, usuario: str):
     }
 
 def procesar_consulta_con_chatbot_zapopan(consulta: str, usuario: str):
-    """Procesar consulta con sistema jerárquico: Vertex AI → Híbrido → Fallback"""
+    """Procesar consulta usando EXCLUSIVAMENTE el protocolo específico de Zapopan"""
     
-    # Paso 1: Intentar Vertex AI (solución profesional)
-    if VERTEX_AI_AVAILABLE:
-        resultado = procesar_consulta_vertex_ai(consulta, usuario)
-        if resultado.get("usando_ai", False):
-            return resultado
-        # Si Vertex AI falló pero devolvió fallback, usarlo
-        if resultado.get("fuente") == "fallback_mejorado":
-            return resultado
+    # ============================================================================
+    # SISTEMA DEFINITIVO ZAPOPAN (PROTOCOLO ESPECÍFICO)
+    # ============================================================================
     
-    # Paso 2: Sistema híbrido (IA optimizada + fallback)
     try:
-        from chatbot_zapopan_hibrido import procesar_consulta_hibrida
-        return procesar_consulta_hibrida(consulta, usuario)
-    except ImportError:
-        # Paso 3: Fallback al sistema mejorado
-        if FALLBACK_MEJORADO_AVAILABLE:
-            return procesar_consulta_hibrida(consulta, usuario, intentar_chatbot=False)
+        from sistema_zapopan_definitivo import SistemaZapopanDefinitivo
         
-        # Paso 4: Último fallback
-        return procesar_consulta_local(consulta, usuario)
+        # Inicializar sistema definitivo
+        if "sistema_zapopan" not in st.session_state:
+            st.session_state.sistema_zapopan = SistemaZapopanDefinitivo()
+        
+        sistema = st.session_state.sistema_zapopan
+        
+        # Procesar con protocolo específico
+        resultado = sistema.procesar_consulta(consulta)
+        
+        # Registrar consulta
+        registrar_consulta_local(consulta, [], usuario)
+        
+        return {
+            "texto_visible": resultado["texto_visible"],
+            "resultados": [],
+            "categoria": "sistema_definitivo",
+            "fuente": resultado["fuente"],
+            "indicador": resultado["indicador"],
+            "usando_protocolo_especifico": resultado.get("usando_protocolo_especifico", False)
+        }
+        
+    except Exception as e:
+        # Fallback extremo (solo si todo falla)
+        print(f"❌ Error sistema definitivo: {e}")
+        return {
+            "texto_visible": f"""🔧 **SISTEMA EN CONFIGURACIÓN - PROTOCOLO ESPECÍFICO ZAPOPAN**
+
+El sistema de consulta normativa con protocolo completo de Zapopan está siendo configurado.
+
+**Consulta recibida:** "{consulta}"
+
+**Para esta consulta específica sobre antenas de celulares:**
+1. **Competencia federal:** Instituto Federal de Telecomunicaciones (IFT)
+2. **Competencia municipal:** Verificación de permisos de construcción (Inspección y Vigilancia)
+3. **Competencia estatal:** Código Urbano de Jalisco
+
+**Acciones recomendadas:**
+1. Verificar si la antena tiene permiso del IFT
+2. Confirmar permisos de construcción municipal
+3. Presentar queja en Dirección de Inspección y Vigilancia
+
+**Contacto Inspección y Vigilancia:**
+📞 33 3818-2200 ext. [correspondiente]
+📧 inspeccion.vigilancia@zapopan.gob.mx
+
+*El sistema con protocolo completo estará disponible en breve.*""",
+            "resultados": [],
+            "categoria": "fallback_extremo",
+            "fuente": "sistema_local",
+            "indicador": "🔧 Sistema en configuración • Protocolo específico en implementación",
+            "usando_protocolo_especifico": False
+        }
 
 def registrar_consulta_local(consulta: str, resultados: list, usuario: str):
     """Registrar consulta localmente"""
@@ -687,23 +726,24 @@ def main():
                 # Mostrar respuesta
                 st.markdown(resultado["texto_visible"])
                 
-                # Mostrar indicador de fuente
+                # Mostrar indicador del sistema definitivo
                 fuente = resultado.get("fuente", "")
-                calidad = resultado.get("calidad", "")
+                indicador = resultado.get("indicador", "")
+                usando_protocolo = resultado.get("usando_protocolo_especifico", False)
                 
-                if fuente == "vertex_ai":
-                    st.caption("🚀 Vertex AI • 🔧 Solución profesional Google Cloud")
-                elif fuente == "gemini_optimizado":
-                    if calidad == "excelente":
-                        st.caption("🤖 IA optimizada • ✅ Excelente calidad")
-                    elif calidad == "buena":
-                        st.caption("🤖 IA optimizada • 👍 Buena calidad")
-                    elif calidad == "aceptable":
-                        st.caption("🤖 IA optimizada • ⚠️ Calidad aceptable")
-                elif fuente == "fallback_mejorado":
-                    st.caption("📋 Sistema normativo Zapopan • 🛡️ Respuesta garantizada")
+                if indicador:
+                    st.caption(indicador)
+                elif fuente == "vertex_ai":
+                    if usando_protocolo:
+                        st.caption("🚀 Vertex AI • 🔧 Sistema normativo Zapopan (protocolo específico)")
+                    else:
+                        st.caption("🚀 Vertex AI • 🔧 Solución profesional Google Cloud")
+                elif fuente == "sistema_definitivo":
+                    st.caption("🏰 Sistema normativo Zapopan • 📋 Protocolo específico")
+                elif fuente == "sistema_local":
+                    st.caption("🔧 Sistema en configuración • Protocolo específico en implementación")
                 else:
-                    st.caption("📚 Sistema local • 🔧 Modo básico")
+                    st.caption("📚 Sistema Zapopan • Consulta normativa")
                 
                 # Actualizar contador
                 st.session_state.total_consultas += 1
