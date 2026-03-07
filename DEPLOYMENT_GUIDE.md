@@ -42,6 +42,10 @@ chatbot-zapopan/
 6. Branch: `main`
 7. Main file path: `app.py`
 
+## ⚠️ **ADVERTENCIA CRÍTICA DE SEGURIDAD**
+
+**NUNCA pongas API Keys reales en archivos que se suban a GitHub.** Google escanea automáticamente repositorios públicos y privados en busca de credenciales expuestas y enviará alertas de seguridad.
+
 **Configurar Secrets (Advanced settings → Secrets):**
 ```toml
 GOOGLE_API_KEY = "REPLACE_WITH_YOUR_API_KEY"
@@ -50,6 +54,8 @@ GOOGLE_API_KEY = "REPLACE_WITH_YOUR_API_KEY"
 # GOOGLE_SHEETS_CREDENTIALS_JSON = "{\"type\": \"service_account\", ...}"
 # GOOGLE_SHEETS_SPREADSHEET_ID = "tu-spreadsheet-id"
 ```
+
+**⚠️ INSTRUCCIÓN:** Reemplaza `REPLACE_WITH_YOUR_API_KEY` con tu API Key real **SOLO en Streamlit Cloud Secrets**, nunca en archivos del repositorio.
 
 ### Paso 3: Configuración de la App
 
