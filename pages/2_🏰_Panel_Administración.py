@@ -5,12 +5,19 @@ Panel avanzado solo para administradores con funcionalidades completas
 
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import json
 import os
 import sys
+
+# Manejo de dependencias opcionales (plotly)
+try:
+    import plotly.express as px
+    import plotly.graph_objects as go
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    PLOTLY_AVAILABLE = False
+    st.warning("⚠️ Plotly no está instalado. Los gráficos estarán limitados.")
 
 # Añadir ruta para importar módulos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

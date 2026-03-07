@@ -1,8 +1,10 @@
+# Configuración de Streamlit para chatbot-zapopan
+
 [theme]
 primaryColor = "#1E3A8A"
 backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F0F2F6"
-textColor = "#262730"
+secondaryBackgroundColor = "#F3F4F6"
+textColor = "#111827"
 font = "sans serif"
 
 [server]
@@ -12,12 +14,3 @@ enableXsrfProtection = true
 
 [browser]
 gatherUsageStats = false
-
-[runner]
-magicEnabled = false
-
-[client]
-showErrorDetails = true
-
-# Configuración para Google AI Studio
-# La API Key se configura en Streamlit Cloud Secrets

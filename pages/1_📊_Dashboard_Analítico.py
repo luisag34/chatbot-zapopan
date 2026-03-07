@@ -5,12 +5,19 @@ Visualización de métricas e indicadores
 
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import json
 import os
 import sys
+
+# Manejo de dependencias opcionales (plotly)
+try:
+    import plotly.express as px
+    import plotly.graph_objects as go
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    PLOTLY_AVAILABLE = False
+    st.warning("⚠️ Plotly no está instalado. Los gráficos estarán limitados.")
 
 # Añadir ruta para importar módulos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -143,19 +150,23 @@ with tab1:
         df_filtered['fecha'] = df_filtered['timestamp'].dt.date
         daily_counts = df_filtered.groupby('fecha').size().reset_index(name='consultas')
         
-        fig_temporal = px.line(
-            daily_counts,
-            x='fecha',
-            y='consultas',
-            title='Consultas por Día',
-            markers=True
-        )
-        fig_temporal.update_layout(
-            xaxis_title="Fecha",
-            yaxis_title="Número de Consultas",
-            hovermode='x unified'
-        )
-        st.plotly_chart(fig_temporal, use_container_width=True)
+        if PLOTLY_AVAILABLE:
+            fig_temporal = px.line(
+                daily_counts,
+                x='fecha',
+                y='consultas',
+                title='Consultas por Día',
+                markers=True
+            )
+            fig_temporal.update_layout(
+                xaxis_title="Fecha",
+                yaxis_title="Número de Consultas",
+                hovermode='x unified'
+            )
+            st.plotly_chart(fig_temporal, use_container_width=True)
+        else:
+            # Alternativa sin plotly
+            st.line_chart(daily_counts.set_index('fecha')['consultas'])
     else:
         st.info("No hay datos temporales disponibles")
 

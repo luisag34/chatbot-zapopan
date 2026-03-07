@@ -50,7 +50,7 @@ class RAGEngine:
     
     def semantic_search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """
-        Búsqueda semántica simple basada en palabras clave
+        Búsqueda semántica mejorada con sinónimos y términos relacionados
         (En producción, usar embeddings + vector DB)
         """
         query_lower = query.lower()
@@ -69,6 +69,24 @@ class RAGEngine:
             'ruido', 'residuos', 'anuncios', 'publicidad', 'obra', 'giro'
         ]
         
+        # Diccionario de sinónimos para búsqueda mejorada
+        synonyms = {
+            'ruido': ['ruido', 'sonido', 'volumen', 'música', 'altavoz', 'parlante', 'bocina', 'estruendo', 'bullicio'],
+            'comercio': ['comercio', 'negocio', 'establecimiento', 'giro', 'local', 'restaurante', 'bar', 'cantina'],
+            'construcción': ['construcción', 'obra', 'edificación', 'remodelación', 'demolición'],
+            'medio ambiente': ['medio ambiente', 'ecología', 'contaminación', 'residuos', 'desechos'],
+            'espacio público': ['espacio público', 'vía pública', 'calle', 'banqueta', 'plaza'],
+            'protección civil': ['protección civil', 'emergencia', 'seguridad', 'riesgo', 'peligro']
+        }
+        
+        # Expandir consulta con sinónimos
+        expanded_query_terms = []
+        for word in query_lower.split():
+            expanded_query_terms.append(word)
+            for key, syn_list in synonyms.items():
+                if word in syn_list:
+                    expanded_query_terms.extend(syn_list)
+        
         scored_chunks = []
         
         for chunk in self.all_chunks:
@@ -77,35 +95,57 @@ class RAGEngine:
             # Texto del chunk
             chunk_text = chunk.get('text', '').lower()
             chunk_citation = chunk.get('citation', '').lower()
+            chunk_document = chunk.get('document_title', '').lower()
             
-            # 1. Coincidencia exacta en palabras clave normativas
-            for keyword in norm_keywords:
-                if keyword in query_lower and keyword in chunk_text:
-                    score += 2
-            
-            # 2. Coincidencia en términos de Zapopan
-            for term in zapopan_terms:
-                if term in query_lower and term in chunk_text:
+            # 1. Coincidencia en términos expandidos
+            for term in expanded_query_terms:
+                if term in chunk_text:
                     score += 1.5
             
-            # 3. Coincidencia de palabras en el texto
-            query_words = set(query_lower.split())
-            chunk_words = set(chunk_text.split())
-            common_words = query_words.intersection(chunk_words)
-            score += len(common_words) * 0.1
+            # 2. Coincidencia en documentos específicos (prioridad alta)
+            document_priority = {
+                'reglamento de policía': 3.0,
+                'reglamento de protección al medio ambiente': 3.0,
+                'reglamento para el comercio': 2.5,
+                'reglamento de construcción': 2.5,
+                'código administrativo': 2.0
+            }
+            
+            for doc_name, doc_score in document_priority.items():
+                if doc_name in chunk_document:
+                    score += doc_score
+            
+            # 3. Coincidencia en términos específicos de la consulta
+            for term in query_lower.split():
+                if len(term) > 3:  # Ignorar palabras cortas
+                    if term in chunk_text:
+                        score += 1.0
             
             # 4. Priorizar artículos sobre contenido general
             if chunk.get('unit_type') == 'article':
-                score += 1
+                score += 1.5
             
-            # 5. Priorizar documentos relevantes por colección
+            # 5. Priorizar por colección temática
             collection = chunk.get('collection', '').lower()
-            if 'construcción' in query_lower and 'construcción' in collection:
-                score += 1
-            if 'comercio' in query_lower and 'comercio' in collection:
-                score += 1
-            if 'medio ambiente' in query_lower and 'ambiental' in collection:
-                score += 1
+            
+            # Mapeo de temas a colecciones
+            theme_mapping = {
+                'ruido': ['comercio', 'medio ambiente', 'policía'],
+                'música': ['comercio', 'policía'],
+                'construcción': ['construcción'],
+                'comercio': ['comercio'],
+                'medio ambiente': ['medio ambiente'],
+                'espacio público': ['policía']
+            }
+            
+            # Aumentar score si la colección coincide con temas de la consulta
+            for theme, collections in theme_mapping.items():
+                if theme in query_lower and collection in collections:
+                    score += 2.0
+            
+            # 6. Penalizar chunks muy cortos o irrelevantes
+            if len(chunk_text) < 50:
+                score -= 1
             
             if score > 0:
                 scored_chunks.append({
@@ -114,6 +154,7 @@ class RAGEngine:
                     'citation': chunk.get('citation', 'Sin cita'),
                     'document': chunk.get('document_title', 'Sin título'),
                     'article': chunk.get('article', ''),
+                    'collection': chunk.get('collection', ''),
                     'text_preview': chunk_text[:200] + '...' if len(chunk_text) > 200 else chunk_text
                 })
         

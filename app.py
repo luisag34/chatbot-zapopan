@@ -759,27 +759,24 @@ if not st.session_state.autenticado:
         Este sistema permite consultar y analizar normativa municipal
         relacionada con inspección, vigilancia y regulación urbana.
         
-        **🔐 Credenciales de acceso:**
+        **🔐 Sistema de acceso seguro:**
         
-        🏰 **Administrador Supremo (Luis - Control total):**  
-        👤 Usuario: `luis_admin`  
-        🔑 Contraseña: `ZapopanAdmin2026!`
-        
-        🧪 **Usuario de demostración (Acceso limitado):**  
-        👤 Usuario: `demo`  
-        🔑 Contraseña: `demo123`
+        Este sistema utiliza autenticación por roles con permisos específicos
+        para cada área del Ayuntamiento de Zapopan.
         
         **👥 Roles disponibles en el sistema:**
         
-        1. **👩‍💼 Directora** - Acceso ejecutivo completo
-        2. **👨‍💼 Jefes de Área** - Gestión operativa por área  
-        3. **👷 Coordinadores Operativos** - Supervisión diaria
-        4. **⚖️ Área Jurídica** - Consultas legales especializadas
-        5. **📞 Atención Ciudadana** - Registro de consultas ciudadanas
+        1. **🏰 Administrador Supremo** - Control total del sistema
+        2. **👩‍💼 Directora** - Acceso ejecutivo completo
+        3. **👨‍💼 Jefes de Área** - Gestión operativa por área  
+        4. **👷 Coordinadores Operativos** - Supervisión diaria
+        5. **⚖️ Área Jurídica** - Consultas legales especializadas
+        6. **📞 Atención Ciudadana** - Registro de consultas ciudadanas
+        7. **🧪 Usuario Demo** - Acceso limitado para demostraciones
         
         **📋 Para obtener credenciales:**  
-        Contacta al administrador supremo (`luis_admin`) para asignar
-        usuario y contraseña según tu rol en la organización.
+        Contacta al administrador del sistema para asignar usuario y contraseña
+        según tu rol y área de responsabilidad en la organización.
         """)
         
         st.markdown("---")
@@ -882,26 +879,34 @@ else:
                     # Actualizar contador
                     st.session_state.total_consultas += 1
                     
-                    # Mostrar detalles técnicos en expander
-                    with st.expander("📈 Ver análisis técnico"):
-                        col_tech1, col_tech2 = st.columns(2)
-                        
-                        with col_tech1:
-                            st.markdown("### 🏷️ Clasificación")
-                            st.json(resultado["classification"], expanded=False)
-                        
-                        with col_tech2:
-                            st.markdown("### ⚖️ Datos RAG")
-                            st.metric("Documentos encontrados", len(resultado["rag_results"]))
-                            st.metric("Tiempo respuesta", f"{resultado['tiempo_respuesta']}s")
-                        
-                        if resultado["dataset_json"]:
-                            st.markdown("### 🗃️ Dataset estructurado")
-                            st.json(resultado["dataset_json"], expanded=False)
+                    # Mostrar detalles técnicos SOLO para administradores
+                    if es_administrador(st.session_state.usuario_actual):
+                        with st.expander("🔧 Análisis técnico (solo administradores)"):
+                            col_tech1, col_tech2 = st.columns(2)
                             
-                            # Botón para ver JSON completo
-                            if st.button("📋 Copiar JSON al portapapeles"):
-                                st.code(json.dumps(resultado["dataset_json"], indent=2, ensure_ascii=False))
+                            with col_tech1:
+                                st.markdown("### 🏷️ Clasificación")
+                                st.json(resultado["classification"], expanded=False)
+                            
+                            with col_tech2:
+                                st.markdown("### ⚖️ Datos RAG")
+                                st.metric("Documentos encontrados", len(resultado["rag_results"]))
+                                st.metric("Tiempo respuesta", f"{resultado['tiempo_respuesta']}s")
+                            
+                            if resultado["dataset_json"]:
+                                st.markdown("### 🗃️ Dataset estructurado")
+                                st.json(resultado["dataset_json"], expanded=False)
+                                
+                                # Botón para ver JSON completo
+                                if st.button("📋 Copiar JSON al portapapeles"):
+                                    st.code(json.dumps(resultado["dataset_json"], indent=2, ensure_ascii=False))
+                    else:
+                        # Para usuarios normales, mostrar solo información básica
+                        with st.expander("📊 Resumen de la consulta"):
+                            st.info(f"**Categoría:** {resultado['classification'].get('categoria_principal', 'General')}")
+                            st.info(f"**Dependencia responsable:** {resultado['classification'].get('dependencia_responsable', 'Por determinar')}")
+                            st.info(f"**Documentos consultados:** {len(resultado['rag_results'])}")
+                            st.info(f"**Nivel de riesgo:** {resultado['classification'].get('nivel_riesgo', 'Por evaluar')}")
                     
                     # Agregar mensaje del asistente con metadata
                     st.session_state.messages.append({
