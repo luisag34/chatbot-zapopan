@@ -30,49 +30,273 @@ except ImportError as e:
     print(f"Error: {e}")
 
 # --- CONFIGURACIÓN DE SEGURIDAD Y ROLES ---
-USUARIOS_AUTORIZADOS = {
+# Base de datos de usuarios (en producción usaría base de datos real)
+USUARIOS_DB = {
     # 🏰 ADMINISTRADOR SUPREMO (Luis - Propietario del sistema)
-    "luis_admin": "ZapopanAdmin2026!",
+    "luis_admin": {
+        "password": "ZapopanAdmin2026!",
+        "nombre_completo": "Luis Alberto Aguirre Gómez",
+        "email": "luis.aguirre34@gmail.com",
+        "rol": "administrador_supremo",
+        "area": "Administración Central",
+        "fecha_creacion": "2026-03-06",
+        "estado": "activo",
+        "ultimo_acceso": None,
+        "consultas_realizadas": 0
+    },
     
-    # 👥 ADMINISTRADORES ZAPOPAN
-    "admin_zapopan": "Inspeccion2025",
+    # 👩‍💼 DIRECTORA (ejemplo - Luis asignará credenciales reales)
+    "directora_ejemplo": {
+        "password": "DirectoraZpn2026!",
+        "nombre_completo": "Ejemplo Directora",
+        "email": "directora@zapopan.gob.mx",
+        "rol": "directora",
+        "area": "Dirección General",
+        "fecha_creacion": "2026-03-06",
+        "estado": "activo",
+        "ultimo_acceso": None,
+        "consultas_realizadas": 0
+    },
     
-    # 👮 INSPECTORES
-    "inspector_01": "Zapopan01",
-    "inspector_02": "Zapopan02",
-    
-    # 🧪 DEMOSTRACIÓN
-    "demo": "demo123"
+    # 🧪 USUARIO DEMO
+    "demo": {
+        "password": "demo123",
+        "nombre_completo": "Usuario de Demostración",
+        "email": "demo@zapopan.gob.mx",
+        "rol": "demo",
+        "area": "Demostración",
+        "fecha_creacion": "2026-03-06",
+        "estado": "activo",
+        "ultimo_acceso": None,
+        "consultas_realizadas": 0
+    }
 }
 
-# --- ROLES Y PERMISOS ---
-ROLES_USUARIOS = {
-    "luis_admin": {
-        "nombre": "Luis Admin",
-        "rol": "administrador_supremo",
-        "permisos": ["admin_completo", "gestion_usuarios", "ver_logs", "config_sistema", "ver_dashboard_avanzado"]
+# Diccionario simple para autenticación (compatibilidad)
+USUARIOS_AUTORIZADOS = {user: data["password"] for user, data in USUARIOS_DB.items()}
+
+# --- ROLES Y PERMISOS DETALLADOS ---
+ROLES_CONFIG = {
+    "administrador_supremo": {
+        "nombre": "Administrador Supremo",
+        "nivel": 100,
+        "permisos": [
+            "admin_completo",
+            "gestion_usuarios_completa",  # Crear, editar, bloquear, eliminar
+            "ver_todos_logs",
+            "config_sistema_completo",
+            "ver_dashboard_ejecutivo",
+            "exportar_todos_datos",
+            "rotar_credenciales",
+            "acceso_panel_admin"
+        ],
+        "descripcion": "Control total del sistema. Solo para el propietario."
     },
-    "admin_zapopan": {
-        "nombre": "Administrador Zapopan", 
-        "rol": "administrador",
-        "permisos": ["gestion_usuarios", "ver_logs", "config_sistema", "ver_dashboard_avanzado"]
+    "directora": {
+        "nombre": "Directora",
+        "nivel": 90,
+        "permisos": [
+            "ver_metricas_completas",
+            "ver_reportes_ejecutivos",
+            "ver_logs_areas",
+            "exportar_datos_areas",
+            "realizar_consultas_avanzadas",
+            "ver_dashboard_ejecutivo",
+            "acceso_panel_metricas"
+        ],
+        "descripcion": "Acceso ejecutivo a todas las métricas y reportes."
     },
-    "inspector_01": {
-        "nombre": "Inspector 01",
-        "rol": "inspector",
-        "permisos": ["realizar_consultas", "ver_dashboard_basico"]
+    "jefe_area": {
+        "nombre": "Jefe de Área",
+        "nivel": 80,
+        "permisos": [
+            "ver_metricas_area",
+            "ver_reportes_area",
+            "gestion_equipo",
+            "realizar_consultas_avanzadas",
+            "ver_dashboard_operativo",
+            "exportar_datos_area"
+        ],
+        "descripcion": "Gestión operativa de un área específica."
     },
-    "inspector_02": {
-        "nombre": "Inspector 02", 
-        "rol": "inspector",
-        "permisos": ["realizar_consultas", "ver_dashboard_basico"]
+    "coordinador_operativo": {
+        "nombre": "Coordinador Operativo",
+        "nivel": 70,
+        "permisos": [
+            "ver_metricas_operativas",
+            "supervisar_consultas",
+            "realizar_consultas",
+            "ver_dashboard_basico",
+            "generar_reportes_diarios"
+        ],
+        "descripcion": "Supervisión diaria y coordinación operativa."
+    },
+    "area_juridica": {
+        "nombre": "Área Jurídica",
+        "nivel": 60,
+        "permisos": [
+            "consultas_legales_avanzadas",
+            "acceso_normativa_completa",
+            "ver_consultas_juridicas",
+            "realizar_consultas",
+            "ver_dashboard_juridico"
+        ],
+        "descripcion": "Acceso especializado a consultas legales y normativa."
+    },
+    "atencion_ciudadana": {
+        "nombre": "Atención Ciudadana",
+        "nivel": 50,
+        "permisos": [
+            "realizar_consultas_basicas",
+            "registrar_consultas_ciudadanas",
+            "ver_consultas_propias",
+            "ver_dashboard_basico"
+        ],
+        "descripcion": "Atención a consultas ciudadanas y registro básico."
     },
     "demo": {
         "nombre": "Usuario Demo",
-        "rol": "demo",
-        "permisos": ["realizar_consultas", "ver_dashboard_basico"]
+        "nivel": 10,
+        "permisos": [
+            "realizar_consultas_demo",
+            "ver_dashboard_basico"
+        ],
+        "descripcion": "Acceso limitado para demostraciones y pruebas."
     }
 }
+
+# Función para obtener información de usuario
+def obtener_info_usuario(username: str):
+    """Obtener información completa de un usuario"""
+    return USUARIOS_DB.get(username)
+
+# Función para verificar permisos
+def tiene_permiso(username: str, permiso: str) -> bool:
+    """Verificar si un usuario tiene un permiso específico"""
+    user_info = obtener_info_usuario(username)
+    if not user_info or user_info["estado"] != "activo":
+        return False
+    
+    rol = user_info["rol"]
+    if rol in ROLES_CONFIG:
+        return permiso in ROLES_CONFIG[rol]["permisos"]
+    return False
+
+def es_administrador(username: str) -> bool:
+    """Verificar si un usuario es administrador"""
+    user_info = obtener_info_usuario(username)
+    if not user_info:
+        return False
+    return user_info["rol"] in ["administrador_supremo", "directora", "jefe_area"]
+
+def puede_gestionar_usuarios(username: str) -> bool:
+    """Verificar si un usuario puede gestionar otros usuarios"""
+    return tiene_permiso(username, "gestion_usuarios_completa")
+
+# Funciones para gestión de usuarios
+def crear_usuario(username: str, password: str, nombre_completo: str, email: str, rol: str, area: str):
+    """Crear un nuevo usuario en el sistema"""
+    if username in USUARIOS_DB:
+        return False, "El usuario ya existe"
+    
+    if rol not in ROLES_CONFIG:
+        return False, "Rol no válido"
+    
+    USUARIOS_DB[username] = {
+        "password": password,
+        "nombre_completo": nombre_completo,
+        "email": email,
+        "rol": rol,
+        "area": area,
+        "fecha_creacion": datetime.now().strftime("%Y-%m-%d"),
+        "estado": "activo",
+        "ultimo_acceso": None,
+        "consultas_realizadas": 0
+    }
+    
+    # Actualizar diccionario de autenticación
+    USUARIOS_AUTORIZADOS[username] = password
+    
+    return True, f"Usuario '{username}' creado exitosamente"
+
+def actualizar_usuario(username: str, **kwargs):
+    """Actualizar información de un usuario"""
+    if username not in USUARIOS_DB:
+        return False, "Usuario no encontrado"
+    
+    # Campos que se pueden actualizar
+    campos_permitidos = ["nombre_completo", "email", "rol", "area", "estado", "password"]
+    
+    for campo, valor in kwargs.items():
+        if campo in campos_permitidos:
+            if campo == "password":
+                # Actualizar también en USUARIOS_AUTORIZADOS
+                USUARIOS_AUTORIZADOS[username] = valor
+            USUARIOS_DB[username][campo] = valor
+    
+    return True, f"Usuario '{username}' actualizado"
+
+def bloquear_usuario(username: str):
+    """Bloquear acceso de un usuario"""
+    return actualizar_usuario(username, estado="bloqueado")
+
+def activar_usuario(username: str):
+    """Activar acceso de un usuario"""
+    return actualizar_usuario(username, estado="activo")
+
+def eliminar_usuario(username: str):
+    """Eliminar un usuario del sistema (solo admin supremo)"""
+    if username == "luis_admin":
+        return False, "No se puede eliminar al administrador supremo"
+    
+    if username in USUARIOS_DB:
+        del USUARIOS_DB[username]
+        if username in USUARIOS_AUTORIZADOS:
+            del USUARIOS_AUTORIZADOS[username]
+        return True, f"Usuario '{username}' eliminado"
+    
+    return False, "Usuario no encontrado"
+
+def registrar_acceso(username: str):
+    """Registrar último acceso de un usuario"""
+    if username in USUARIOS_DB:
+        USUARIOS_DB[username]["ultimo_acceso"] = datetime.now().isoformat()
+        return True
+    return False
+
+def incrementar_consultas(username: str):
+    """Incrementar contador de consultas de un usuario"""
+    if username in USUARIOS_DB:
+        USUARIOS_DB[username]["consultas_realizadas"] += 1
+        return True
+    return False
+
+def obtener_usuarios_por_rol(rol: str):
+    """Obtener todos los usuarios de un rol específico"""
+    return {user: info for user, info in USUARIOS_DB.items() if info["rol"] == rol}
+
+def obtener_usuarios_por_area(area: str):
+    """Obtener todos los usuarios de un área específica"""
+    return {user: info for user, info in USUARIOS_DB.items() if info["area"] == area}
+
+def obtener_estadisticas_usuarios():
+    """Obtener estadísticas de usuarios"""
+    total = len(USUARIOS_DB)
+    activos = sum(1 for info in USUARIOS_DB.values() if info["estado"] == "activo")
+    bloqueados = total - activos
+    
+    # Distribución por rol
+    por_rol = {}
+    for info in USUARIOS_DB.values():
+        rol = info["rol"]
+        por_rol[rol] = por_rol.get(rol, 0) + 1
+    
+    return {
+        "total_usuarios": total,
+        "usuarios_activos": activos,
+        "usuarios_bloqueados": bloqueados,
+        "distribucion_por_rol": por_rol
+    }
 
 def tiene_permiso(usuario: str, permiso: str) -> bool:
     """Verificar si un usuario tiene un permiso específico"""
@@ -247,67 +471,228 @@ with st.sidebar:
     
     if "autenticado" in st.session_state and st.session_state.autenticado:
         usuario_actual = st.session_state.usuario_actual
-        st.success(f"✅ Conectado como: **{usuario_actual}**")
+        usuario_info = st.session_state.get("usuario_info", {})
         
-        # Mostrar rol del usuario
-        if usuario_actual in ROLES_USUARIOS:
-            rol_info = ROLES_USUARIOS[usuario_actual]
-            st.info(f"👑 **Rol:** {rol_info['nombre']} ({rol_info['rol'].replace('_', ' ').title()})")
+        # Información del usuario
+        st.success(f"✅ Conectado como: **{usuario_info.get('nombre_completo', usuario_actual)}**")
         
-        st.markdown("### 📊 Estadísticas")
-        if "total_consultas" in st.session_state:
-            st.metric("Consultas realizadas", st.session_state.total_consultas)
+        # Mostrar información detallada
+        with st.expander("👤 Información de tu cuenta", expanded=False):
+            col_info1, col_info2 = st.columns(2)
+            with col_info1:
+                st.write(f"**Usuario:** {usuario_actual}")
+                st.write(f"**Rol:** {ROLES_CONFIG.get(usuario_info.get('rol', ''), {}).get('nombre', 'N/A')}")
+                st.write(f"**Área:** {usuario_info.get('area', 'N/A')}")
+            with col_info2:
+                st.write(f"**Estado:** {usuario_info.get('estado', 'N/A')}")
+                st.write(f"**Consultas:** {usuario_info.get('consultas_realizadas', 0)}")
+                if usuario_info.get('ultimo_acceso'):
+                    st.write(f"**Último acceso:** {usuario_info.get('ultimo_acceso', 'N/A')[:16]}")
         
-        # --- SECCIÓN DE ADMINISTRACIÓN (SOLO PARA ADMINS) ---
-        if es_administrador(usuario_actual):
+        st.markdown("### 📊 Estadísticas Personales")
+        col_stat1, col_stat2 = st.columns(2)
+        with col_stat1:
+            if "total_consultas" in st.session_state:
+                st.metric("Consultas esta sesión", st.session_state.total_consultas)
+        with col_stat2:
+            st.metric("Consultas totales", usuario_info.get('consultas_realizadas', 0))
+        
+        # --- SECCIÓN DE GESTIÓN DE USUARIOS (SOLO PARA ADMINISTRADOR SUPREMO) ---
+        if usuario_actual == "luis_admin" and puede_gestionar_usuarios(usuario_actual):
             st.markdown("---")
-            st.markdown("### 🏰 **PANEL DE ADMINISTRACIÓN**")
+            st.markdown("### 🏰 **GESTIÓN DE USUARIOS**")
             
-            # Pestañas de administración
-            admin_tab1, admin_tab2, admin_tab3 = st.tabs(["👥 Usuarios", "📈 Métricas", "⚙️ Configuración"])
+            # Pestañas de gestión
+            gest_tab1, gest_tab2, gest_tab3 = st.tabs(["👥 Ver Usuarios", "➕ Crear Usuario", "⚙️ Gestionar"])
+            
+            with gest_tab1:
+                st.subheader("📋 Lista Completa de Usuarios")
+                
+                # Crear DataFrame con todos los usuarios
+                usuarios_lista = []
+                for username, info in USUARIOS_DB.items():
+                    usuarios_lista.append({
+                        "Usuario": username,
+                        "Nombre Completo": info.get("nombre_completo", ""),
+                        "Email": info.get("email", ""),
+                        "Rol": ROLES_CONFIG.get(info.get("rol", ""), {}).get("nombre", info.get("rol", "")),
+                        "Área": info.get("area", ""),
+                        "Estado": info.get("estado", ""),
+                        "Consultas": info.get("consultas_realizadas", 0),
+                        "Creado": info.get("fecha_creacion", ""),
+                        "Último Acceso": info.get("ultimo_acceso", "")[:19] if info.get("ultimo_acceso") else "Nunca"
+                    })
+                
+                df_usuarios = pd.DataFrame(usuarios_lista)
+                st.dataframe(df_usuarios, use_container_width=True, hide_index=True)
+                
+                # Estadísticas
+                stats = obtener_estadisticas_usuarios()
+                col_stat1, col_stat2, col_stat3 = st.columns(3)
+                with col_stat1:
+                    st.metric("Total Usuarios", stats["total_usuarios"])
+                with col_stat2:
+                    st.metric("Usuarios Activos", stats["usuarios_activos"])
+                with col_stat3:
+                    st.metric("Usuarios Bloqueados", stats["usuarios_bloqueados"])
+            
+            with gest_tab2:
+                st.subheader("➕ Crear Nuevo Usuario")
+                
+                with st.form("crear_usuario_form"):
+                    col_form1, col_form2 = st.columns(2)
+                    
+                    with col_form1:
+                        nuevo_usuario = st.text_input("Nombre de usuario*", help="Sin espacios, minúsculas")
+                        nombre_completo = st.text_input("Nombre completo*")
+                        email = st.text_input("Email*")
+                    
+                    with col_form2:
+                        rol = st.selectbox(
+                            "Rol*",
+                            options=list(ROLES_CONFIG.keys()),
+                            format_func=lambda x: ROLES_CONFIG[x]["nombre"]
+                        )
+                        area = st.selectbox(
+                            "Área*",
+                            options=[
+                                "Dirección General",
+                                "Inspección y Vigilancia", 
+                                "Área Jurídica",
+                                "Atención Ciudadana",
+                                "Coordinación Operativa",
+                                "Administración Central",
+                                "Demostración"
+                            ]
+                        )
+                        password = st.text_input("Contraseña*", type="password", help="Mínimo 8 caracteres")
+                        confirm_password = st.text_input("Confirmar contraseña*", type="password")
+                    
+                    submitted = st.form_submit_button("✅ Crear Usuario", type="primary")
+                    
+                    if submitted:
+                        # Validaciones
+                        if not all([nuevo_usuario, nombre_completo, email, password, confirm_password]):
+                            st.error("Todos los campos marcados con * son obligatorios")
+                        elif password != confirm_password:
+                            st.error("Las contraseñas no coinciden")
+                        elif len(password) < 8:
+                            st.error("La contraseña debe tener al menos 8 caracteres")
+                        elif nuevo_usuario in USUARIOS_DB:
+                            st.error(f"El usuario '{nuevo_usuario}' ya existe")
+                        else:
+                            success, message = crear_usuario(
+                                username=nuevo_usuario,
+                                password=password,
+                                nombre_completo=nombre_completo,
+                                email=email,
+                                rol=rol,
+                                area=area
+                            )
+                            if success:
+                                st.success(message)
+                                st.info(f"**Credenciales asignadas:**\n👤 Usuario: `{nuevo_usuario}`\n🔑 Contraseña: `{password}`")
+                                st.warning("⚠️ Guarda estas credenciales. Serán necesarias para el primer acceso.")
+                            else:
+                                st.error(f"Error: {message}")
+            
+            with gest_tab3:
+                st.subheader("⚙️ Gestionar Usuarios Existentes")
+                
+                # Seleccionar usuario a gestionar
+                usuarios_disponibles = [u for u in USUARIOS_DB.keys() if u != "luis_admin"]
+                usuario_gestionar = st.selectbox("Seleccionar usuario a gestionar", usuarios_disponibles)
+                
+                if usuario_gestionar:
+                    info_usuario = USUARIOS_DB[usuario_gestionar]
+                    
+                    st.markdown(f"**Gestionando:** {info_usuario.get('nombre_completo')} ({usuario_gestionar})")
+                    
+                    col_acc1, col_acc2, col_acc3 = st.columns(3)
+                    
+                    with col_acc1:
+                        if info_usuario["estado"] == "activo":
+                            if st.button("🚫 Bloquear Usuario", use_container_width=True, type="secondary"):
+                                success, msg = bloquear_usuario(usuario_gestionar)
+                                if success:
+                                    st.success(msg)
+                                    st.rerun()
+                                else:
+                                    st.error(msg)
+                        else:
+                            if st.button("✅ Activar Usuario", use_container_width=True, type="primary"):
+                                success, msg = activar_usuario(usuario_gestionar)
+                                if success:
+                                    st.success(msg)
+                                    st.rerun()
+                                else:
+                                    st.error(msg)
+                    
+                    with col_acc2:
+                        if st.button("🔄 Cambiar Contraseña", use_container_width=True):
+                            nueva_pass = st.text_input("Nueva contraseña", type="password", key=f"new_pass_{usuario_gestionar}")
+                            confirm_pass = st.text_input("Confirmar", type="password", key=f"confirm_pass_{usuario_gestionar}")
+                            if st.button("💾 Guardar", key=f"save_pass_{usuario_gestionar}"):
+                                if nueva_pass and nueva_pass == confirm_pass:
+                                    success, msg = actualizar_usuario(usuario_gestionar, password=nueva_pass)
+                                    if success:
+                                        st.success(f"Contraseña actualizada para '{usuario_gestionar}'")
+                                    else:
+                                        st.error(msg)
+                    
+                    with col_acc3:
+                        if st.button("🗑️ Eliminar Usuario", use_container_width=True, type="secondary"):
+                            st.warning(f"⚠️ ¿Eliminar permanentemente a '{usuario_gestionar}'?")
+                            confirmar = st.checkbox("Confirmar eliminación permanente")
+                            if confirmar:
+                                success, msg = eliminar_usuario(usuario_gestionar)
+                                if success:
+                                    st.error(f"Usuario '{usuario_gestionar}' eliminado permanentemente")
+                                    st.rerun()
+                                else:
+                                    st.error(msg)
+                    
+                    # Información actual del usuario
+                    with st.expander("📋 Ver información detallada"):
+                        st.json(info_usuario)
+        
+        # --- PANEL DE ADMINISTRACIÓN GENERAL (PARA TODOS LOS ADMINS) ---
+        elif es_administrador(usuario_actual):
+            st.markdown("---")
+            st.markdown("### 📊 **PANEL DE ADMINISTRACIÓN**")
+            
+            admin_tab1, admin_tab2 = st.tabs(["📈 Métricas", "⚙️ Configuración"])
             
             with admin_tab1:
-                st.subheader("Gestión de Usuarios")
-                st.dataframe(
-                    pd.DataFrame([
-                        {
-                            "Usuario": user,
-                            "Nombre": ROLES_USUARIOS.get(user, {}).get("nombre", "N/A"),
-                            "Rol": ROLES_USUARIOS.get(user, {}).get("rol", "N/A"),
-                            "Estado": "Activo"
-                        }
-                        for user in USUARIOS_AUTORIZADOS.keys()
-                    ]),
-                    use_container_width=True
-                )
-                
-                if usuario_actual == "luis_admin":
-                    st.subheader("Acciones de Administrador Supremo")
-                    if st.button("🔄 Rotar contraseñas demo", help="Generar nuevas contraseñas para usuarios demo"):
-                        st.info("Función en desarrollo - Próxima versión")
-                    
-                    if st.button("📋 Generar reporte de seguridad", help="Reporte detallado de uso y seguridad"):
-                        st.info("Función en desarrollo - Próxima versión")
-            
-            with admin_tab2:
-                st.subheader("Métricas Avanzadas")
-                # Cargar datos de consultas
+                st.subheader("Métricas del Sistema")
                 try:
                     with open("log_consultas.jsonl", "r") as f:
                         lineas = f.readlines()
                     total_consultas = len(lineas)
                     st.metric("Total consultas sistema", total_consultas)
                     
-                    # Análisis básico
                     if lineas:
-                        st.metric("Consultas hoy", sum(1 for _ in lineas[-10:]))  # Últimas 10 como ejemplo
-                        st.metric("Tasa uso", f"{min(100, total_consultas)}%")
+                        # Consultas hoy (simplificado)
+                        hoy = datetime.now().date()
+                        consultas_hoy = 0
+                        for linea in lineas[-50:]:  # Revisar últimas 50
+                            try:
+                                data = json.loads(linea)
+                                if 'timestamp' in data:
+                                    fecha = datetime.fromisoformat(data['timestamp']).date()
+                                    if fecha == hoy:
+                                        consultas_hoy += 1
+                            except:
+                                continue
+                        
+                        st.metric("Consultas hoy", consultas_hoy)
+                        st.metric("Tasa uso", f"{min(100, total_consultas // 10)}%")
                     else:
                         st.info("No hay datos de consultas aún")
                 except:
                     st.info("No hay datos de métricas disponibles")
             
-            with admin_tab3:
+            with admin_tab2:
                 st.subheader("Configuración del Sistema")
                 st.info("Configuración avanzada - Próxima versión")
                 if st.button("🔄 Reiniciar motor RAG"):
@@ -376,16 +761,25 @@ if not st.session_state.autenticado:
         
         **🔐 Credenciales de acceso:**
         
-        🏰 **Administrador Supremo (Luis):**  
+        🏰 **Administrador Supremo (Luis - Control total):**  
         👤 Usuario: `luis_admin`  
         🔑 Contraseña: `ZapopanAdmin2026!`
         
-        🧪 **Usuario de demostración:**  
+        🧪 **Usuario de demostración (Acceso limitado):**  
         👤 Usuario: `demo`  
         🔑 Contraseña: `demo123`
         
-        👥 **Otros usuarios:**  
-        Contacta al administrador para credenciales personalizadas.
+        **👥 Roles disponibles en el sistema:**
+        
+        1. **👩‍💼 Directora** - Acceso ejecutivo completo
+        2. **👨‍💼 Jefes de Área** - Gestión operativa por área  
+        3. **👷 Coordinadores Operativos** - Supervisión diaria
+        4. **⚖️ Área Jurídica** - Consultas legales especializadas
+        5. **📞 Atención Ciudadana** - Registro de consultas ciudadanas
+        
+        **📋 Para obtener credenciales:**  
+        Contacta al administrador supremo (`luis_admin`) para asignar
+        usuario y contraseña según tu rol en la organización.
         """)
         
         st.markdown("---")
@@ -396,14 +790,29 @@ if not st.session_state.autenticado:
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
             if st.button("🚪 Ingresar", type="primary", use_container_width=True):
-                if user in USUARIOS_AUTORIZADOS and USUARIOS_AUTORIZADOS[user] == password:
-                    st.session_state.autenticado = True
-                    st.session_state.usuario_actual = user
-                    st.session_state.messages = []
-                    st.session_state.total_consultas = 0
-                    st.rerun()
+                # Verificar credenciales y estado del usuario
+                if user in USUARIOS_DB:
+                    user_info = USUARIOS_DB[user]
+                    
+                    # Verificar contraseña
+                    if user_info["password"] == password:
+                        # Verificar estado del usuario
+                        if user_info["estado"] == "activo":
+                            # Registrar acceso exitoso
+                            registrar_acceso(user)
+                            
+                            st.session_state.autenticado = True
+                            st.session_state.usuario_actual = user
+                            st.session_state.usuario_info = user_info
+                            st.session_state.messages = []
+                            st.session_state.total_consultas = 0
+                            st.rerun()
+                        else:
+                            st.error(f"❌ Usuario **{user}** está **{user_info['estado']}**. Contacta al administrador.")
+                    else:
+                        st.error("❌ Contraseña incorrecta")
                 else:
-                    st.error("❌ Credenciales incorrectas")
+                    st.error("❌ Usuario no encontrado")
         
         with col_btn2:
             if st.button("🆘 Ayuda", use_container_width=True):

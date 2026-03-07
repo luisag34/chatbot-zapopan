@@ -30,7 +30,15 @@ usuario_actual = st.session_state.usuario_actual
 
 # Importar funciones de permisos desde app.py
 try:
-    from app import es_administrador, ROLES_USUARIOS, USUARIOS_AUTORIZADOS
+    from app import (
+        es_administrador, 
+        puede_gestionar_usuarios,
+        USUARIOS_DB,
+        ROLES_CONFIG,
+        obtener_estadisticas_usuarios,
+        obtener_usuarios_por_rol,
+        obtener_usuarios_por_area
+    )
 except:
     st.error("❌ Error cargando módulos de seguridad")
     st.stop()
@@ -43,7 +51,11 @@ if not es_administrador(usuario_actual):
 
 # Título principal
 st.title("🏰 Panel de Administración - Sistema Normativo Zapopan")
-st.markdown(f"**Administrador conectado:** `{usuario_actual}` | **Rol:** {ROLES_USUARIOS.get(usuario_actual, {}).get('nombre', 'N/A')}")
+# Obtener información del usuario actual
+usuario_info = USUARIOS_DB.get(usuario_actual, {})
+rol_nombre = ROLES_CONFIG.get(usuario_info.get('rol', ''), {}).get('nombre', 'N/A')
+
+st.markdown(f"**Administrador conectado:** `{usuario_actual}` | **Rol:** {rol_nombre}")
 st.markdown("---")
 
 # Pestañas principales
@@ -72,7 +84,8 @@ with tab1:
     
     with col2:
         # Usuarios activos
-        usuarios_activos = len(USUARIOS_AUTORIZADOS)
+        stats = obtener_estadisticas_usuarios()
+        usuarios_activos = stats["usuarios_activos"]
         st.metric("Usuarios Activos", usuarios_activos)
     
     with col3:
@@ -133,16 +146,23 @@ with tab2:
     # Mostrar tabla de usuarios
     st.subheader("Usuarios del Sistema")
     
-    usuarios_df = pd.DataFrame([
-        {
-            "Usuario": user,
-            "Nombre": ROLES_USUARIOS.get(user, {}).get("nombre", "N/A"),
-            "Rol": ROLES_USUARIOS.get(user, {}).get("rol", "N/A").replace("_", " ").title(),
-            "Permisos": ", ".join(ROLES_USUARIOS.get(user, {}).get("permisos", [])[:3]) + ("..." if len(ROLES_USUARIOS.get(user, {}).get("permisos", [])) > 3 else ""),
-            "Estado": "✅ Activo"
-        }
-        for user in USUARIOS_AUTORIZADOS.keys()
-    ])
+    # Crear DataFrame con información de usuarios
+    usuarios_lista = []
+    for username, info in USUARIOS_DB.items():
+        rol_nombre = ROLES_CONFIG.get(info.get('rol', ''), {}).get('nombre', info.get('rol', ''))
+        usuarios_lista.append({
+            "Usuario": username,
+            "Nombre": info.get('nombre_completo', 'N/A'),
+            "Email": info.get('email', 'N/A'),
+            "Rol": rol_nombre,
+            "Área": info.get('area', 'N/A'),
+            "Estado": "✅ Activo" if info.get('estado') == 'activo' else "🚫 Bloqueado",
+            "Consultas": info.get('consultas_realizadas', 0),
+            "Creado": info.get('fecha_creacion', 'N/A'),
+            "Último Acceso": info.get('ultimo_acceso', 'N/A')[:19] if info.get('ultimo_acceso') else "Nunca"
+        })
+    
+    usuarios_df = pd.DataFrame(usuarios_lista)
     
     st.dataframe(usuarios_df, use_container_width=True, hide_index=True)
     
@@ -168,7 +188,7 @@ with tab2:
         
         with col_edit:
             with st.expander("✏️ Editar Usuario"):
-                usuario_editar = st.selectbox("Seleccionar usuario", list(USUARIOS_AUTORIZADOS.keys()))
+                usuario_editar = st.selectbox("Seleccionar usuario", list(USUARIOS_DB.keys()))
                 if usuario_editar:
                     st.info(f"Editando: {usuario_editar}")
                     nueva_pass_edit = st.text_input("Nueva contraseña", type="password")
@@ -178,7 +198,7 @@ with tab2:
         with col_del:
             with st.expander("🗑️ Eliminar Usuario"):
                 usuario_eliminar = st.selectbox("Usuario a eliminar", 
-                                               [u for u in USUARIOS_AUTORIZADOS.keys() if u != "luis_admin"])
+                                               [u for u in USUARIOS_DB.keys() if u != "luis_admin"])
                 if usuario_eliminar:
                     st.warning(f"⚠️ Eliminar usuario: {usuario_eliminar}")
                     confirmar = st.checkbox("Confirmar eliminación")
