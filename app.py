@@ -143,6 +143,10 @@ def main():
     # Indicador del sistema
     st.caption("📋 Sistema normativo Zapopan • ✅ Protocolo específico (local)")
     
+    # Inicializar historial si no existe
+    if "historial" not in st.session_state:
+        st.session_state.historial = []
+    
     # Historial de consultas
     if st.session_state.historial:
         with st.expander("📜 Historial de consultas recientes", expanded=False):
