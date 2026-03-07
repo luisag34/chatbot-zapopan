@@ -249,10 +249,27 @@ def main():
                 else:
                     st.error("❌ Credenciales incorrectas")
         
-        # Credenciales de prueba (solo en desarrollo)
-        with st.expander("🧪 Credenciales de prueba (desarrollo)"):
-            st.code("Usuario: luis_admin\nContraseña: ZapopanAdmin2026!")
-            st.code("Usuario: demo\nContraseña: demo123")
+        # INSTRUCCIONES SEGURAS (sin credenciales)
+        with st.expander("📋 Instrucciones de acceso"):
+            st.markdown("""
+            ### 🔐 Sistema de acceso seguro
+            
+            **Para acceder al sistema:**
+            
+            1. **Contacta al administrador** para obtener usuario y contraseña
+            2. **Cada usuario tiene credenciales únicas** asignadas
+            3. **No compartas tus credenciales** con otras personas
+            
+            ### 👥 Roles disponibles:
+            
+            - **Administrador Supremo:** Control total del sistema
+            - **Usuario Demo:** Acceso básico para demostraciones
+            - **Usuarios operativos:** Según área de responsabilidad
+            
+            ### 📞 Soporte:
+            
+            Si necesitas acceso, contacta al área de Sistemas del Ayuntamiento.
+            """)
         
         return
     
