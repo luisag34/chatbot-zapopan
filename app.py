@@ -24,32 +24,299 @@ st.set_page_config(
 # ============================================================================
 
 USUARIOS_DB = {
+    # ========================================================================
+    # NIVEL 1: ADMINISTRACIÓN CENTRAL
+    # ========================================================================
     "luis_admin": {
         "password": "ZapopanAdmin2026!",
         "nombre_completo": "Luis Alberto Aguirre Gómez",
         "email": "luis.aguirre34@gmail.com",
         "rol": "administrador_supremo",
         "area": "Administración Central",
-        "estado": "activo"
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
     },
+    
+    # ========================================================================
+    # NIVEL 2: DIRECCIÓN
+    # ========================================================================
+    "directora_inspeccion": {
+        "password": "Zapopan2026!DIV1",
+        "nombre_completo": "María Luisa Vargas",
+        "email": "directora.inspeccion@zapopan.gob.mx",
+        "rol": "directora",
+        "area": "Dirección de Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    # ========================================================================
+    # NIVEL 3: JEFES DE ÁREA
+    # ========================================================================
+    "jefe_comercio": {
+        "password": "Zapopan2026!JCO1",
+        "nombre_completo": "Rubén Alejandro Zúñiga",
+        "email": "ruben.zuniga@zapopan.gob.mx",
+        "rol": "jefe_area",
+        "area": "Área de Comercio - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    "jefe_atencion": {
+        "password": "Zapopan2026!JAT1",
+        "nombre_completo": "Adriana [APELLIDO_PENDIENTE]",
+        "email": "adriana.atencion@zapopan.gob.mx",
+        "rol": "jefe_area",
+        "area": "Atención Ciudadana - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    "jefe_horarios": {
+        "password": "Zapopan2026!JHO1",
+        "nombre_completo": "Cornelio González",
+        "email": "cornelio.gonzalez@zapopan.gob.mx",
+        "rol": "jefe_area",
+        "area": "Área de Horarios Especiales - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    "jefe_tecnica": {
+        "password": "Zapopan2026!JTE1",
+        "nombre_completo": "Ignacio Ortiz",
+        "email": "ignacio.ortiz@zapopan.gob.mx",
+        "rol": "jefe_area",
+        "area": "Área Técnica - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    "jefe_construccion": {
+        "password": "Zapopan2026!JCN1",
+        "nombre_completo": "Heriberto Rodríguez",
+        "email": "heriberto.rodriguez@zapopan.gob.mx",
+        "rol": "jefe_area",
+        "area": "Área de Construcción - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    # ========================================================================
+    # NIVEL 4: JEFES OPERATIVOS (PLACEHOLDERS - COMPLETAR PRÓXIMA SEMANA)
+    # ========================================================================
+    "jefe_operativo_01": {
+        "password": "Zapopan2026!JO01",
+        "nombre_completo": "Jefe Operativo 01 (Nombre Pendiente)",
+        "email": "jefe.operativo01@zapopan.gob.mx",
+        "rol": "jefe_area",
+        "area": "Inspección y Vigilancia - Operaciones",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    "jefe_operativo_02": {
+        "password": "Zapopan2026!JO02",
+        "nombre_completo": "Jefe Operativo 02 (Nombre Pendiente)",
+        "email": "jefe.operativo02@zapopan.gob.mx",
+        "rol": "jefe_area",
+        "area": "Inspección y Vigilancia - Operaciones",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    "jefe_operativo_03": {
+        "password": "Zapopan2026!JO03",
+        "nombre_completo": "Jefe Operativo 03 (Nombre Pendiente)",
+        "email": "jefe.operativo03@zapopan.gob.mx",
+        "rol": "jefe_area",
+        "area": "Inspección y Vigilancia - Operaciones",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    # ========================================================================
+    # NIVEL 5: OPERATIVOS JURÍDICA
+    # ========================================================================
+    "juridico_01": {
+        "password": "Zapopan2026!JU01",
+        "nombre_completo": "Diana Valeria Mendoza",
+        "email": "diana.mendoza@zapopan.gob.mx",
+        "rol": "operativo_juridico",
+        "area": "Área Jurídica - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    "juridico_02": {
+        "password": "Zapopan2026!JU02",
+        "nombre_completo": "Diana Montserrat Tellez",
+        "email": "diana.tellez@zapopan.gob.mx",
+        "rol": "operativo_juridico",
+        "area": "Área Jurídica - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    "juridico_03": {
+        "password": "Zapopan2026!JU03",
+        "nombre_completo": "Edgardo [APELLIDO_PENDIENTE]",
+        "email": "edgardo.juridico@zapopan.gob.mx",
+        "rol": "operativo_juridico",
+        "area": "Área Jurídica - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None
+    },
+    
+    "juridico_04": {
+        "password": "Zapopan2026!JU04",
+        "nombre_completo": "Operativo Jurídico 04 (Nombre Pendiente)",
+        "email": "juridico04@zapopan.gob.mx",
+        "rol": "operativo_juridico",
+        "area": "Área Jurídica - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    "juridico_05": {
+        "password": "Zapopan2026!JU05",
+        "nombre_completo": "Operativo Jurídico 05 (Nombre Pendiente)",
+        "email": "juridico05@zapopan.gob.mx",
+        "rol": "operativo_juridico",
+        "area": "Área Jurídica - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    # ========================================================================
+    # NIVEL 6: OPERATIVOS ATENCIÓN CIUDADANA (PLACEHOLDERS)
+    # ========================================================================
+    "atencion_01": {
+        "password": "Zapopan2026!AC01",
+        "nombre_completo": "Operativo Atención 01 (Nombre Pendiente)",
+        "email": "atencion01@zapopan.gob.mx",
+        "rol": "operativo_atencion",
+        "area": "Atención Ciudadana - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    "atencion_02": {
+        "password": "Zapopan2026!AC02",
+        "nombre_completo": "Operativo Atención 02 (Nombre Pendiente)",
+        "email": "atencion02@zapopan.gob.mx",
+        "rol": "operativo_atencion",
+        "area": "Atención Ciudadana - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    "atencion_03": {
+        "password": "Zapopan2026!AC03",
+        "nombre_completo": "Operativo Atención 03 (Nombre Pendiente)",
+        "email": "atencion03@zapopan.gob.mx",
+        "rol": "operativo_atencion",
+        "area": "Atención Ciudadana - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    "atencion_04": {
+        "password": "Zapopan2026!AC04",
+        "nombre_completo": "Operativo Atención 04 (Nombre Pendiente)",
+        "email": "atencion04@zapopan.gob.mx",
+        "rol": "operativo_atencion",
+        "area": "Atención Ciudadana - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    "atencion_05": {
+        "password": "Zapopan2026!AC05",
+        "nombre_completo": "Operativo Atención 05 (Nombre Pendiente)",
+        "email": "atencion05@zapopan.gob.mx",
+        "rol": "operativo_atencion",
+        "area": "Atención Ciudadana - Inspección y Vigilancia",
+        "estado": "activo",
+        "fecha_creacion": "2026-03-07",
+        "ultimo_acceso": None,
+        "nota": "COMPLETAR: Nombre completo y email real la próxima semana"
+    },
+    
+    # ========================================================================
+    # DEMO
+    # ========================================================================
     "demo": {
         "password": "demo123",
         "nombre_completo": "Usuario de Demostración",
         "email": "demo@zapopan.gob.mx",
         "rol": "demo",
         "area": "Demostración",
-        "estado": "activo"
+        "estado": "activo",
+        "fecha_creacion": "2026-03-06",
+        "ultimo_acceso": None
     }
 }
 
 ROLES_CONFIG = {
     "administrador_supremo": {
         "nombre": "Administrador Supremo",
-        "permisos": ["admin_completo", "gestion_usuarios"]
+        "permisos": ["admin_completo", "gestion_usuarios"],
+        "nivel": 100
+    },
+    "directora": {
+        "nombre": "Directora",
+        "permisos": ["supervision_general", "reportes", "ver_usuarios"],
+        "nivel": 90
+    },
+    "jefe_area": {
+        "nombre": "Jefe de Área",
+        "permisos": ["gestion_equipo", "reportes_area", "consultas_avanzadas"],
+        "nivel": 80
+    },
+    "operativo_juridico": {
+        "nombre": "Operativo Jurídico",
+        "permisos": ["consultas_juridicas", "documentacion", "seguimiento"],
+        "nivel": 70
+    },
+    "operativo_atencion": {
+        "nombre": "Operativo Atención Ciudadana",
+        "permisos": ["consultas_ciudadanas", "derivacion", "registro"],
+        "nivel": 70
     },
     "demo": {
         "nombre": "Usuario Demo",
-        "permisos": ["consultas_basicas"]
+        "permisos": ["consultas_basicas"],
+        "nivel": 10
     }
 }
 
@@ -60,7 +327,11 @@ ROLES_CONFIG = {
 def autenticar_usuario(usuario: str, password: str) -> bool:
     """Autenticación simple sin dependencias externas"""
     if usuario in USUARIOS_DB:
-        return USUARIOS_DB[usuario]["password"] == password
+        if USUARIOS_DB[usuario]["password"] == password:
+            # Registrar último acceso
+            from datetime import datetime
+            USUARIOS_DB[usuario]["ultimo_acceso"] = datetime.now().isoformat()
+            return True
     return False
 
 def obtener_info_usuario(usuario: str):
@@ -71,6 +342,37 @@ def es_administrador(usuario: str) -> bool:
     """Verificar si es administrador"""
     info = obtener_info_usuario(usuario)
     return info and info["rol"] == "administrador_supremo"
+
+def cambiar_contrasena(usuario: str, contrasena_actual: str, contrasena_nueva: str) -> bool:
+    """Cambiar contraseña de usuario"""
+    if usuario not in USUARIOS_DB:
+        return False
+    
+    if USUARIOS_DB[usuario]["password"] != contrasena_actual:
+        return False
+    
+    # Validar seguridad de nueva contraseña
+    if len(contrasena_nueva) < 8:
+        return False
+    
+    # Actualizar contraseña
+    USUARIOS_DB[usuario]["password"] = contrasena_nueva
+    return True
+
+def validar_fortaleza_contrasena(contrasena: str) -> dict:
+    """Validar fortaleza de contraseña"""
+    validaciones = {
+        "longitud_minima": len(contrasena) >= 8,
+        "tiene_mayuscula": any(c.isupper() for c in contrasena),
+        "tiene_minuscula": any(c.islower() for c in contrasena),
+        "tiene_numero": any(c.isdigit() for c in contrasena),
+        "tiene_especial": any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in contrasena)
+    }
+    
+    return {
+        "valida": all(validaciones.values()),
+        "detalles": validaciones
+    }
 
 # ============================================================================
 # SISTEMA DE CONSULTAS LOCAL (SIN GOOGLE AI)
@@ -306,6 +608,31 @@ def main():
                     st.metric("Total consultas sistema", len(lineas))
                 except:
                     st.metric("Total consultas sistema", 0)
+        
+        # Panel de cambio de contraseña
+        st.markdown("---")
+        with st.expander("🔐 Cambiar contraseña"):
+            contrasena_actual = st.text_input("Contraseña actual", type="password", key="cambiar_actual")
+            contrasena_nueva = st.text_input("Nueva contraseña", type="password", key="cambiar_nueva")
+            contrasena_confirmar = st.text_input("Confirmar nueva contraseña", type="password", key="cambiar_confirmar")
+            
+            if st.button("🔄 Cambiar contraseña", width='stretch'):
+                if not contrasena_actual or not contrasena_nueva or not contrasena_confirmar:
+                    st.error("❌ Todos los campos son obligatorios")
+                elif contrasena_nueva != contrasena_confirmar:
+                    st.error("❌ Las contraseñas nuevas no coinciden")
+                else:
+                    validacion = validar_fortaleza_contrasena(contrasena_nueva)
+                    if not validacion["valida"]:
+                        st.error("❌ La contraseña no cumple con los requisitos de seguridad:")
+                        for criterio, cumple in validacion["detalles"].items():
+                            icono = "✅" if cumple else "❌"
+                            st.write(f"{icono} {criterio.replace('_', ' ').title()}")
+                    elif cambiar_contrasena(usuario_actual, contrasena_actual, contrasena_nueva):
+                        st.success("✅ Contraseña cambiada exitosamente")
+                        st.info("🔒 La próxima vez que ingreses, usa tu nueva contraseña")
+                    else:
+                        st.error("❌ Contraseña actual incorrecta o usuario no encontrado")
         
         st.markdown("---")
         if st.button("🚪 Cerrar sesión", width='stretch'):
