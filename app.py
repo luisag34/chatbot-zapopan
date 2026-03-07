@@ -9,13 +9,16 @@ import os
 import sys
 from datetime import datetime
 
-# Importar módulo del chatbot de Google AI Studio (versión simple)
+# Importar módulo de fallback mejorado (SIEMPRE disponible)
 try:
-    from chatbot_zapopan_simple import procesar_consulta_con_chatbot
-    CHATBOT_MODULE_AVAILABLE = True
+    from fallback_mejorado import procesar_consulta_hibrida
+    FALLBACK_MEJORADO_AVAILABLE = True
 except ImportError:
-    CHATBOT_MODULE_AVAILABLE = False
-    st.warning("⚠️ Módulo Chatbot Zapopan no disponible. Usando modo local.")
+    FALLBACK_MEJORADO_AVAILABLE = False
+    st.warning("⚠️ Módulo fallback mejorado no disponible.")
+
+# Importar módulo del chatbot (OPCIONAL - temporalmente desactivado)
+CHATBOT_MODULE_AVAILABLE = False  # Temporalmente desactivado hasta debug
 
 # ============================================================================
 # CONFIGURACIÓN BÁSICA
@@ -487,16 +490,13 @@ def procesar_consulta_local(consulta: str, usuario: str):
     }
 
 def procesar_consulta_con_chatbot_zapopan(consulta: str, usuario: str):
-    """Procesar consulta usando el chatbot de Google AI Studio"""
+    """Procesar consulta usando sistema híbrido (fallback mejorado por ahora)"""
     
-    # Intentar usar el chatbot si está disponible
-    if CHATBOT_MODULE_AVAILABLE:
-        try:
-            return procesar_consulta_con_chatbot(consulta, usuario)
-        except Exception as e:
-            st.warning(f"⚠️ Chatbot temporalmente no disponible: {str(e)[:80]}...")
+    # TEMPORAL: Usar siempre fallback mejorado hasta debuggear chatbot
+    if FALLBACK_MEJORADO_AVAILABLE:
+        return procesar_consulta_hibrida(consulta, usuario, intentar_chatbot=False)
     
-    # Fallback a procesamiento local
+    # Fallback a procesamiento local original
     return procesar_consulta_local(consulta, usuario)
 
 def registrar_consulta_local(consulta: str, resultados: list, usuario: str):
@@ -667,10 +667,13 @@ def main():
                 st.markdown(resultado["texto_visible"])
                 
                 # Mostrar indicador de fuente
-                if resultado.get("usando_ai", False):
+                fuente = resultado.get("fuente", "")
+                if fuente == "fallback_mejorado":
+                    st.caption("📋 Respuesta del sistema normativo Zapopan (modo local mejorado)")
+                elif resultado.get("usando_ai", False):
                     st.caption("🤖 Respuesta del chatbot Zapopan (Google AI Studio)")
-                elif resultado.get("fuente") == "local_fallback":
-                    st.caption("📚 Respuesta de base de conocimiento local (modo fallback)")
+                else:
+                    st.caption("📚 Respuesta de base de conocimiento local")
                 
                 # Actualizar contador
                 st.session_state.total_consultas += 1
