@@ -29,13 +29,62 @@ except ImportError as e:
     st.error(f"❌ Error cargando módulos: {e}")
     print(f"Error: {e}")
 
-# --- CONFIGURACIÓN DE SEGURIDAD ---
+# --- CONFIGURACIÓN DE SEGURIDAD Y ROLES ---
 USUARIOS_AUTORIZADOS = {
+    # 🏰 ADMINISTRADOR SUPREMO (Luis - Propietario del sistema)
+    "luis_admin": "ZapopanAdmin2026!",
+    
+    # 👥 ADMINISTRADORES ZAPOPAN
     "admin_zapopan": "Inspeccion2025",
+    
+    # 👮 INSPECTORES
     "inspector_01": "Zapopan01",
     "inspector_02": "Zapopan02",
-    "demo": "demo123"  # Usuario de demostración
+    
+    # 🧪 DEMOSTRACIÓN
+    "demo": "demo123"
 }
+
+# --- ROLES Y PERMISOS ---
+ROLES_USUARIOS = {
+    "luis_admin": {
+        "nombre": "Luis Admin",
+        "rol": "administrador_supremo",
+        "permisos": ["admin_completo", "gestion_usuarios", "ver_logs", "config_sistema", "ver_dashboard_avanzado"]
+    },
+    "admin_zapopan": {
+        "nombre": "Administrador Zapopan", 
+        "rol": "administrador",
+        "permisos": ["gestion_usuarios", "ver_logs", "config_sistema", "ver_dashboard_avanzado"]
+    },
+    "inspector_01": {
+        "nombre": "Inspector 01",
+        "rol": "inspector",
+        "permisos": ["realizar_consultas", "ver_dashboard_basico"]
+    },
+    "inspector_02": {
+        "nombre": "Inspector 02", 
+        "rol": "inspector",
+        "permisos": ["realizar_consultas", "ver_dashboard_basico"]
+    },
+    "demo": {
+        "nombre": "Usuario Demo",
+        "rol": "demo",
+        "permisos": ["realizar_consultas", "ver_dashboard_basico"]
+    }
+}
+
+def tiene_permiso(usuario: str, permiso: str) -> bool:
+    """Verificar si un usuario tiene un permiso específico"""
+    if usuario in ROLES_USUARIOS:
+        return permiso in ROLES_USUARIOS[usuario]["permisos"]
+    return False
+
+def es_administrador(usuario: str) -> bool:
+    """Verificar si un usuario es administrador"""
+    if usuario in ROLES_USUARIOS:
+        return ROLES_USUARIOS[usuario]["rol"] in ["administrador_supremo", "administrador"]
+    return False
 
 # --- CONFIGURACIÓN DE GEMINI ---
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
@@ -197,12 +246,76 @@ with st.sidebar:
     st.markdown("---")
     
     if "autenticado" in st.session_state and st.session_state.autenticado:
-        st.success(f"✅ Conectado como: **{st.session_state.usuario_actual}**")
+        usuario_actual = st.session_state.usuario_actual
+        st.success(f"✅ Conectado como: **{usuario_actual}**")
+        
+        # Mostrar rol del usuario
+        if usuario_actual in ROLES_USUARIOS:
+            rol_info = ROLES_USUARIOS[usuario_actual]
+            st.info(f"👑 **Rol:** {rol_info['nombre']} ({rol_info['rol'].replace('_', ' ').title()})")
         
         st.markdown("### 📊 Estadísticas")
         if "total_consultas" in st.session_state:
             st.metric("Consultas realizadas", st.session_state.total_consultas)
         
+        # --- SECCIÓN DE ADMINISTRACIÓN (SOLO PARA ADMINS) ---
+        if es_administrador(usuario_actual):
+            st.markdown("---")
+            st.markdown("### 🏰 **PANEL DE ADMINISTRACIÓN**")
+            
+            # Pestañas de administración
+            admin_tab1, admin_tab2, admin_tab3 = st.tabs(["👥 Usuarios", "📈 Métricas", "⚙️ Configuración"])
+            
+            with admin_tab1:
+                st.subheader("Gestión de Usuarios")
+                st.dataframe(
+                    pd.DataFrame([
+                        {
+                            "Usuario": user,
+                            "Nombre": ROLES_USUARIOS.get(user, {}).get("nombre", "N/A"),
+                            "Rol": ROLES_USUARIOS.get(user, {}).get("rol", "N/A"),
+                            "Estado": "Activo"
+                        }
+                        for user in USUARIOS_AUTORIZADOS.keys()
+                    ]),
+                    use_container_width=True
+                )
+                
+                if usuario_actual == "luis_admin":
+                    st.subheader("Acciones de Administrador Supremo")
+                    if st.button("🔄 Rotar contraseñas demo", help="Generar nuevas contraseñas para usuarios demo"):
+                        st.info("Función en desarrollo - Próxima versión")
+                    
+                    if st.button("📋 Generar reporte de seguridad", help="Reporte detallado de uso y seguridad"):
+                        st.info("Función en desarrollo - Próxima versión")
+            
+            with admin_tab2:
+                st.subheader("Métricas Avanzadas")
+                # Cargar datos de consultas
+                try:
+                    with open("log_consultas.jsonl", "r") as f:
+                        lineas = f.readlines()
+                    total_consultas = len(lineas)
+                    st.metric("Total consultas sistema", total_consultas)
+                    
+                    # Análisis básico
+                    if lineas:
+                        st.metric("Consultas hoy", sum(1 for _ in lineas[-10:]))  # Últimas 10 como ejemplo
+                        st.metric("Tasa uso", f"{min(100, total_consultas)}%")
+                    else:
+                        st.info("No hay datos de consultas aún")
+                except:
+                    st.info("No hay datos de métricas disponibles")
+            
+            with admin_tab3:
+                st.subheader("Configuración del Sistema")
+                st.info("Configuración avanzada - Próxima versión")
+                if st.button("🔄 Reiniciar motor RAG"):
+                    st.success("Motor RAG reiniciado (simulación)")
+                if st.button("📊 Actualizar datasets"):
+                    st.info("Actualización programada para próxima versión")
+        
+        st.markdown("---")
         st.markdown("### 🔧 Herramientas")
         if st.button("📥 Exportar datos", help="Descargar registro de consultas"):
             try:
@@ -261,9 +374,18 @@ if not st.session_state.autenticado:
         Este sistema permite consultar y analizar normativa municipal
         relacionada con inspección, vigilancia y regulación urbana.
         
-        **Credenciales de demostración:**  
+        **🔐 Credenciales de acceso:**
+        
+        🏰 **Administrador Supremo (Luis):**  
+        👤 Usuario: `luis_admin`  
+        🔑 Contraseña: `ZapopanAdmin2026!`
+        
+        🧪 **Usuario de demostración:**  
         👤 Usuario: `demo`  
         🔑 Contraseña: `demo123`
+        
+        👥 **Otros usuarios:**  
+        Contacta al administrador para credenciales personalizadas.
         """)
         
         st.markdown("---")
