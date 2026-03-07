@@ -67,32 +67,47 @@ class SistemaHibridoZapopan:
             "total_consultas": 0,
             "ia_exitosas": 0,
             "fallback_usado": 0,
-            "errores_ia": 0
+            "errores_ia": 0,
+            "ia_desactivada": True  # Temporalmente desactivada
         }
     
     def procesar_consulta(self, consulta: str) -> Dict:
         """Procesar consulta con sistema híbrido"""
         self.estadisticas["total_consultas"] += 1
         
-        # Paso 1: Intentar IA optimizada
-        if self.ia_configurada:
-            resultado_ia = self._intentar_ia(consulta)
-            
-            if resultado_ia["valida"]:
-                self.estadisticas["ia_exitosas"] += 1
-                return {
-                    "texto": resultado_ia["respuesta"],
-                    "fuente": "gemini_optimizado",
-                    "usando_ia": True,
-                    "calidad": resultado_ia["calidad"],
-                    "longitud": len(resultado_ia["respuesta"])
-                }
-            else:
-                self.estadisticas["errores_ia"] += 1
+        # ⚠️ TEMPORAL: IA DESACTIVADA POR PROBLEMAS TÉCNICOS
+        # Gemini 2.5-flash trunca respuestas, Gemini 2.5-pro no responde
+        # Usar siempre fallback mejorado hasta resolver problemas de API
         
-        # Paso 2: Usar fallback mejorado
+        # Paso 1: Usar fallback mejorado (IA temporalmente desactivada)
         self.estadisticas["fallback_usado"] += 1
-        return self._usar_fallback(consulta)
+        resultado = self._usar_fallback(consulta)
+        
+        # Registrar que IA está desactivada
+        self.estadisticas["ia_desactivada"] = True
+        
+        return resultado
+        
+        # CÓDIGO ORIGINAL (comentado para referencia):
+        # # Paso 1: Intentar IA optimizada
+        # if self.ia_configurada:
+        #     resultado_ia = self._intentar_ia(consulta)
+        #     
+        #     if resultado_ia["valida"]:
+        #         self.estadisticas["ia_exitosas"] += 1
+        #         return {
+        #             "texto": resultado_ia["respuesta"],
+        #             "fuente": "gemini_optimizado",
+        #             "usando_ia": True,
+        #             "calidad": resultado_ia["calidad"],
+        #             "longitud": len(resultado_ia["respuesta"])
+        #         }
+        #     else:
+        #         self.estadisticas["errores_ia"] += 1
+        # 
+        # # Paso 2: Usar fallback mejorado
+        # self.estadisticas["fallback_usado"] += 1
+        # return self._usar_fallback(consulta)
     
     def _intentar_ia(self, consulta: str) -> Dict:
         """Intentar IA con configuración optimizada"""

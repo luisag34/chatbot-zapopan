@@ -723,7 +723,7 @@ def main():
         """)
     
     st.caption(f"Sistema Normativo Zapopan • Usuario: {usuario_actual} • {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    st.caption("🏰 Sistema híbrido definitivo - Fallback garantizado + IA optimizada cuando disponible")
+    st.caption("🏰 Sistema normativo garantizado • 🔧 IA temporalmente en optimización técnica")
 
 # ============================================================================
 # EJECUCIÓN
