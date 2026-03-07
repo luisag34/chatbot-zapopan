@@ -1,8 +1,18 @@
-# SOLO STREAMLIT - NADA MÁS
-# Versiones compatibles con Python 3.14.3 de Streamlit Cloud
+# Requirements para chatbot-zapopan
+# Versiones compatibles con Python 3.9.18 (Streamlit Cloud)
 
+# Core
 streamlit==1.55.0
 
-# NOTA: NO incluir google-genai - causa errores
-# NOTA: NO incluir pandas/numpy - vienen con Streamlit
-# NOTA: Streamlit Cloud ya instala todo lo necesario
+# Google AI - PARA PRUEBAS (comentar si causa errores)
+# google-genai==1.66.0
+
+# NOTA: Si google-genai causa errores en Streamlit Cloud:
+# 1. Comentar la línea de arriba
+# 2. El sistema usará fallback local automáticamente
+# 3. Doom ajustará según feedback de deployment
+
+# Dependencias que ya vienen con Streamlit Cloud:
+# - pandas
+# - numpy
+# - requests

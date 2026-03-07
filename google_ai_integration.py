@@ -15,11 +15,20 @@ import streamlit as st
 # Intentar importar Google AI, pero tener fallback si no está disponible
 GOOGLE_AI_AVAILABLE = False
 try:
-    import google.generativeai as genai
+    # Intentar nueva versión primero (google.genai)
+    import google.genai as genai
     GOOGLE_AI_AVAILABLE = True
+    GENAI_VERSION = "new"
 except ImportError:
-    st.warning("⚠️ Google AI no está instalado. Usando modo local.")
-    genai = None
+    try:
+        # Fallback a versión deprecated (google.generativeai)
+        import google.generativeai as genai
+        GOOGLE_AI_AVAILABLE = True
+        GENAI_VERSION = "deprecated"
+    except ImportError:
+        st.warning("⚠️ Google AI no está instalado. Usando modo local.")
+        genai = None
+        GENAI_VERSION = "none"
 
 # ============================================================================
 # CLASE PRINCIPAL DE INTEGRACIÓN
