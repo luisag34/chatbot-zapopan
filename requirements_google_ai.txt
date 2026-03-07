@@ -1,0 +1,17 @@
+# Requirements para Google AI integration
+# Versiones compatibles con Python 3.9.18 (Streamlit Cloud)
+
+# Core
+streamlit==1.55.0
+
+# Google AI - ÚLTIMA versión compatible
+google-genai==1.66.0
+
+# Dependencias que ya vienen con Streamlit Cloud:
+# - pandas
+# - numpy
+# - requests
+
+# NOTA: Este archivo es para referencia.
+# El requirements.txt principal se mantendrá solo con streamlit==1.55.0
+# hasta que probemos la compatibilidad en Streamlit Cloud.
