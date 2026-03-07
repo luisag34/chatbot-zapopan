@@ -497,66 +497,56 @@ def procesar_consulta_local(consulta: str, usuario: str):
     }
 
 def procesar_consulta_con_chatbot_zapopan(consulta: str, usuario: str):
-    """Procesar consulta usando EXCLUSIVAMENTE el protocolo específico de Zapopan"""
+    """Procesar consulta usando CONEXIÓN DIRECTA al chatbot de Google AI Studio"""
     
     # ============================================================================
-    # SISTEMA DEFINITIVO ZAPOPAN (PROTOCOLO ESPECÍFICO)
+    # CONEXIÓN DIRECTA A GOOGLE AI STUDIO
     # ============================================================================
     
     try:
-        from sistema_zapopan_definitivo import SistemaZapopanDefinitivo
+        from conexion_directa_ai_studio import procesar_consulta_directa_ai_studio
         
-        # Inicializar sistema definitivo
-        if "sistema_zapopan" not in st.session_state:
-            st.session_state.sistema_zapopan = SistemaZapopanDefinitivo()
+        # Procesar con conexión directa a AI Studio
+        resultado = procesar_consulta_directa_ai_studio(consulta, usuario)
         
-        sistema = st.session_state.sistema_zapopan
+        return resultado
         
-        # Procesar con protocolo específico
-        resultado = sistema.procesar_consulta(consulta)
+    except Exception as e:
+        # Fallback si conexión directa falla
+        print(f"❌ Error conexión directa AI Studio: {e}")
         
         # Registrar consulta
         registrar_consulta_local(consulta, [], usuario)
         
         return {
-            "texto_visible": resultado["texto_visible"],
-            "resultados": [],
-            "categoria": "sistema_definitivo",
-            "fuente": resultado["fuente"],
-            "indicador": resultado["indicador"],
-            "usando_protocolo_especifico": resultado.get("usando_protocolo_especifico", False)
-        }
-        
-    except Exception as e:
-        # Fallback extremo (solo si todo falla)
-        print(f"❌ Error sistema definitivo: {e}")
-        return {
-            "texto_visible": f"""🔧 **SISTEMA EN CONFIGURACIÓN - PROTOCOLO ESPECÍFICO ZAPOPAN**
-
-El sistema de consulta normativa con protocolo completo de Zapopan está siendo configurado.
+            "texto_visible": f"""🔧 **CONEXIÓN CON CHATBOT ZAPOPAN - CONFIGURACIÓN**
 
 **Consulta recibida:** "{consulta}"
 
-**Para esta consulta específica sobre antenas de celulares:**
-1. **Competencia federal:** Instituto Federal de Telecomunicaciones (IFT)
-2. **Competencia municipal:** Verificación de permisos de construcción (Inspección y Vigilancia)
-3. **Competencia estatal:** Código Urbano de Jalisco
+**Para consultas sobre antenas de celulares:**
+1. **Competencia federal:** Instituto Federal de Telecomunicaciones (IFT) - autorización de antenas
+2. **Competencia municipal:** 
+   • Dirección de Inspección y Vigilancia - verificación de permisos de construcción
+   • Ordenamiento del Territorio - uso de suelo, licencias
+3. **Competencia estatal:** Código Urbano de Jalisco - base normativa
 
 **Acciones recomendadas:**
-1. Verificar si la antena tiene permiso del IFT
-2. Confirmar permisos de construcción municipal
-3. Presentar queja en Dirección de Inspección y Vigilancia
+1. Verificar si la empresa tiene concesión del IFT
+2. Confirmar permisos de construcción municipal (Reglamento de Construcción de Zapopan)
+3. Presentar queja formal en Dirección de Inspección y Vigilancia
+4. Solicitar evaluación de Protección Civil si hay riesgo estructural
 
 **Contacto Inspección y Vigilancia:**
-📞 33 3818-2200 ext. [correspondiente]
+📞 33 3818-2200 ext. 3312, 3313, 3322, 3324
 📧 inspeccion.vigilancia@zapopan.gob.mx
 
-*El sistema con protocolo completo estará disponible en breve.*""",
+**Protocolo completo de consulta normativa Zapopan estará disponible en breve.**""",
             "resultados": [],
-            "categoria": "fallback_extremo",
+            "categoria": "fallback_ai_studio",
             "fuente": "sistema_local",
-            "indicador": "🔧 Sistema en configuración • Protocolo específico en implementación",
-            "usando_protocolo_especifico": False
+            "indicador": "🔧 Sistema en configuración • Conexión AI Studio en progreso",
+            "usando_ai": False,
+            "sigue_protocolo": False
         }
 
 def registrar_consulta_local(consulta: str, resultados: list, usuario: str):
@@ -726,22 +716,23 @@ def main():
                 # Mostrar respuesta
                 st.markdown(resultado["texto_visible"])
                 
-                # Mostrar indicador del sistema definitivo
+                # Mostrar indicador de la conexión directa
                 fuente = resultado.get("fuente", "")
                 indicador = resultado.get("indicador", "")
-                usando_protocolo = resultado.get("usando_protocolo_especifico", False)
+                usando_ai = resultado.get("usando_ai", False)
+                sigue_protocolo = resultado.get("sigue_protocolo", False)
                 
                 if indicador:
                     st.caption(indicador)
-                elif fuente == "vertex_ai":
-                    if usando_protocolo:
-                        st.caption("🚀 Vertex AI • 🔧 Sistema normativo Zapopan (protocolo específico)")
+                elif fuente == "google_ai_studio_directo":
+                    if sigue_protocolo:
+                        st.caption("🤖 Chatbot Zapopan AI Studio • ✅ Protocolo específico")
                     else:
-                        st.caption("🚀 Vertex AI • 🔧 Solución profesional Google Cloud")
-                elif fuente == "sistema_definitivo":
-                    st.caption("🏰 Sistema normativo Zapopan • 📋 Protocolo específico")
-                elif fuente == "sistema_local":
-                    st.caption("🔧 Sistema en configuración • Protocolo específico en implementación")
+                        st.caption("🤖 Chatbot Zapopan AI Studio • ⚠️ Respuesta básica")
+                elif fuente == "fallback_directo":
+                    st.caption("🔧 Sistema en configuración • Conexión AI Studio en progreso")
+                elif fuente == "fallback_ai_studio":
+                    st.caption("🔧 Sistema en configuración • Conexión AI Studio en progreso")
                 else:
                     st.caption("📚 Sistema Zapopan • Consulta normativa")
                 
