@@ -880,7 +880,8 @@ else:
                     st.session_state.total_consultas += 1
                     
                     # Mostrar detalles técnicos SOLO para administradores
-                    if es_administrador(st.session_state.usuario_actual):
+                    usuario_actual = st.session_state.usuario_actual
+                    if es_administrador(usuario_actual):
                         with st.expander("🔧 Análisis técnico (solo administradores)"):
                             col_tech1, col_tech2 = st.columns(2)
                             
