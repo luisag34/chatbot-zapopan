@@ -4,13 +4,13 @@
 # Core
 streamlit==1.55.0
 
-# Google AI - PARA PRUEBAS (comentar si causa errores)
+# Para chatbot de Google AI Studio (OPCIONAL - comentar si causa errores)
 # google-genai==1.66.0
 
 # NOTA: Si google-genai causa errores en Streamlit Cloud:
 # 1. Comentar la línea de arriba
 # 2. El sistema usará fallback local automáticamente
-# 3. Doom ajustará según feedback de deployment
+# 3. Chatbot funcionará si API key está en Secrets
 
 # Dependencias que ya vienen con Streamlit Cloud:
 # - pandas

@@ -1,0 +1,5 @@
+# Requirements MINIMAL para chatbot-zapopan
+# Si google-genai causa errores, usar este archivo
+
+# Solo Streamlit - todo lo demás es fallback local
+streamlit==1.55.0

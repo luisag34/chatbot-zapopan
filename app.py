@@ -9,13 +9,13 @@ import os
 import sys
 from datetime import datetime
 
-# Importar módulo de Google AI (si está disponible)
+# Importar módulo del chatbot de Google AI Studio (versión simple)
 try:
-    from google_ai_integration import create_google_ai_integration, hybrid_query
-    GOOGLE_AI_MODULE_AVAILABLE = True
+    from chatbot_zapopan_simple import procesar_consulta_con_chatbot
+    CHATBOT_MODULE_AVAILABLE = True
 except ImportError:
-    GOOGLE_AI_MODULE_AVAILABLE = False
-    st.warning("⚠️ Módulo Google AI no disponible. Usando modo local.")
+    CHATBOT_MODULE_AVAILABLE = False
+    st.warning("⚠️ Módulo Chatbot Zapopan no disponible. Usando modo local.")
 
 # ============================================================================
 # CONFIGURACIÓN BÁSICA
@@ -486,50 +486,15 @@ def procesar_consulta_local(consulta: str, usuario: str):
         "categoria": resultados[0]["dependencia"].split()[-1].lower() if resultados else "general"
     }
 
-def procesar_consulta_con_google_ai(consulta: str, usuario: str):
-    """Procesar consulta con Google AI (sistema híbrido)"""
+def procesar_consulta_con_chatbot_zapopan(consulta: str, usuario: str):
+    """Procesar consulta usando el chatbot de Google AI Studio"""
     
-    # Primero buscar en base local para contexto
-    resultados_locales = buscar_en_base_conocimiento(consulta)
-    
-    # Determinar tipo de consulta basado en contenido
-    query_type = "general"
-    consulta_lower = consulta.lower()
-    
-    if any(word in consulta_lower for word in ["legal", "jurídic", "ley", "reglamento", "artículo", "norma"]):
-        query_type = "legal"
-    elif any(word in consulta_lower for word in ["ciudadano", "vecino", "queja", "solicitud", "atención"]):
-        query_type = "citizen"
-    
-    # Intentar Google AI si el módulo está disponible
-    if GOOGLE_AI_MODULE_AVAILABLE:
+    # Intentar usar el chatbot si está disponible
+    if CHATBOT_MODULE_AVAILABLE:
         try:
-            # Crear integración
-            google_ai_integration = create_google_ai_integration()
-            
-            # Consulta híbrida
-            resultado = hybrid_query(
-                query=consulta,
-                query_type=query_type,
-                local_context=resultados_locales,
-                google_ai_integration=google_ai_integration
-            )
-            
-            if resultado["success"]:
-                # Registrar consulta exitosa
-                registrar_consulta_local(consulta, resultados_locales, usuario)
-                
-                return {
-                    "texto_visible": resultado["response"],
-                    "resultados": resultados_locales,
-                    "categoria": query_type,
-                    "fuente": resultado["source"],
-                    "usando_google_ai": resultado["source"] == "google_ai"
-                }
-            
+            return procesar_consulta_con_chatbot(consulta, usuario)
         except Exception as e:
-            # Si Google AI falla, continuar con fallback
-            st.warning(f"⚠️ Google AI temporalmente no disponible: {str(e)[:100]}...")
+            st.warning(f"⚠️ Chatbot temporalmente no disponible: {str(e)[:80]}...")
     
     # Fallback a procesamiento local
     return procesar_consulta_local(consulta, usuario)
@@ -693,19 +658,19 @@ def main():
         with st.chat_message("user"):
             st.markdown(prompt)
         
-        # Procesar consulta CON GOOGLE AI (si está disponible)
+        # Procesar consulta CON CHATBOT ZAPOPAN (si está disponible)
         with st.chat_message("assistant"):
-            with st.spinner("🤖 Analizando con IA..." if GOOGLE_AI_MODULE_AVAILABLE else "🔍 Consultando regulaciones..."):
-                resultado = procesar_consulta_con_google_ai(prompt, usuario_actual)
+            with st.spinner("🤖 Consultando chatbot Zapopan..." if CHATBOT_MODULE_AVAILABLE else "🔍 Consultando regulaciones..."):
+                resultado = procesar_consulta_con_chatbot_zapopan(prompt, usuario_actual)
                 
                 # Mostrar respuesta
                 st.markdown(resultado["texto_visible"])
                 
-                # Mostrar indicador de fuente si es Google AI
-                if resultado.get("usando_google_ai", False):
-                    st.caption("🤖 Respuesta generada con Google AI")
+                # Mostrar indicador de fuente
+                if resultado.get("usando_ai", False):
+                    st.caption("🤖 Respuesta del chatbot Zapopan (Google AI Studio)")
                 elif resultado.get("fuente") == "local_fallback":
-                    st.caption("📚 Respuesta de base de conocimiento local")
+                    st.caption("📚 Respuesta de base de conocimiento local (modo fallback)")
                 
                 # Actualizar contador
                 st.session_state.total_consultas += 1
