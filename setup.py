@@ -8,13 +8,11 @@ setup(
     author_email="luis.aguirre34@gmail.com",
     packages=find_packages(),
     install_requires=[
-        "streamlit==1.28.1",
-        "pandas==2.1.4",
-        "numpy==1.24.4",
-        "google-generativeai==0.3.2",
-        "plotly==5.18.0",
-        "python-dotenv==1.0.0",
-        "requests==2.31.0",
+        "streamlit==1.55.0",
+        "pandas==2.3.3",
+        "numpy==2.4.2",
+        "google-genai==0.8.6",
+        "requests==2.32.5",
     ],
     python_requires=">=3.9",
 )

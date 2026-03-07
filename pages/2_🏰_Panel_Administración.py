@@ -1,6 +1,6 @@
 """
-🏰 Panel de Administración - Sistema de Consulta Normativa Zapopan
-Panel avanzado solo para administradores con funcionalidades completas
+🏰 Panel de Administración SIMPLE - Sistema de Consulta Normativa Zapopan
+Versión sin dependencias externas (sin plotly)
 """
 
 import streamlit as st
@@ -9,15 +9,6 @@ from datetime import datetime, timedelta
 import json
 import os
 import sys
-
-# Manejo de dependencias opcionales (plotly)
-try:
-    import plotly.express as px
-    import plotly.graph_objects as go
-    PLOTLY_AVAILABLE = True
-except ImportError:
-    PLOTLY_AVAILABLE = False
-    st.warning("⚠️ Plotly no está instalado. Los gráficos estarán limitados.")
 
 # Añadir ruta para importar módulos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -42,9 +33,7 @@ try:
         puede_gestionar_usuarios,
         USUARIOS_DB,
         ROLES_CONFIG,
-        obtener_estadisticas_usuarios,
-        obtener_usuarios_por_rol,
-        obtener_usuarios_por_area
+        obtener_estadisticas_usuarios
     )
 except:
     st.error("❌ Error cargando módulos de seguridad")
@@ -56,22 +45,21 @@ if not es_administrador(usuario_actual):
     st.info(f"Tu usuario '{usuario_actual}' no tiene permisos de administrador.")
     st.stop()
 
-# Título principal
-st.title("🏰 Panel de Administración - Sistema Normativo Zapopan")
 # Obtener información del usuario actual
 usuario_info = USUARIOS_DB.get(usuario_actual, {})
 rol_nombre = ROLES_CONFIG.get(usuario_info.get('rol', ''), {}).get('nombre', 'N/A')
 
+# Título principal
+st.title("🏰 Panel de Administración - Sistema Normativo Zapopan")
 st.markdown(f"**Administrador conectado:** `{usuario_actual}` | **Rol:** {rol_nombre}")
 st.markdown("---")
 
 # Pestañas principales
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📊 Dashboard Ejecutivo", 
     "👥 Gestión de Usuarios", 
     "📈 Análisis de Uso", 
-    "🔧 Configuración", 
-    "🔒 Seguridad"
+    "🔧 Configuración"
 ])
 
 with tab1:
@@ -112,38 +100,34 @@ with tab1:
         except:
             st.metric("Tasa de Uso", "0%")
     
-    # Gráfico de consultas por día
+    # Gráfico simple de consultas por día
     st.subheader("📅 Consultas por Día (Últimos 30 días)")
     try:
-        df_consultas = pd.DataFrame(consultas)
-        if 'timestamp' in df_consultas.columns:
-            df_consultas['fecha'] = pd.to_datetime(df_consultas['timestamp']).dt.date
-            df_consultas['fecha'] = pd.to_datetime(df_consultas['fecha'])
-            
-            # Filtrar últimos 30 días
-            fecha_limite = datetime.now() - timedelta(days=30)
-            df_reciente = df_consultas[df_consultas['fecha'] >= fecha_limite]
-            
-            if not df_reciente.empty:
-                consultas_por_dia = df_reciente.groupby('fecha').size().reset_index(name='consultas')
+        if consultas:
+            df_consultas = pd.DataFrame(consultas)
+            if 'timestamp' in df_consultas.columns:
+                df_consultas['fecha'] = pd.to_datetime(df_consultas['timestamp']).dt.date
+                df_consultas['fecha'] = pd.to_datetime(df_consultas['fecha'])
                 
-                fig = px.line(
-                    consultas_por_dia,
-                    x='fecha',
-                    y='consultas',
-                    title='Consultas por Día',
-                    markers=True
-                )
-                fig.update_layout(
-                    xaxis_title="Fecha",
-                    yaxis_title="Número de Consultas",
-                    hovermode='x unified'
-                )
-                st.plotly_chart(fig, use_container_width=True)
+                # Filtrar últimos 30 días
+                fecha_limite = datetime.now() - timedelta(days=30)
+                df_reciente = df_consultas[df_consultas['fecha'] >= fecha_limite]
+                
+                if not df_reciente.empty:
+                    consultas_por_dia = df_reciente.groupby('fecha').size().reset_index(name='consultas')
+                    
+                    # Usar gráfico nativo de Streamlit
+                    st.line_chart(consultas_por_dia.set_index('fecha')['consultas'])
+                    
+                    # Tabla de datos
+                    with st.expander("📊 Ver datos detallados"):
+                        st.dataframe(consultas_por_dia.sort_values('fecha', ascending=False))
+                else:
+                    st.info("No hay datos de consultas en los últimos 30 días")
             else:
-                st.info("No hay datos de consultas en los últimos 30 días")
+                st.info("No hay datos de timestamp disponibles")
         else:
-            st.info("No hay datos de timestamp disponibles")
+            st.info("No hay consultas registradas")
     except Exception as e:
         st.info(f"No hay datos suficientes para gráfico: {e}")
 
@@ -153,7 +137,6 @@ with tab2:
     # Mostrar tabla de usuarios
     st.subheader("Usuarios del Sistema")
     
-    # Crear DataFrame con información de usuarios
     usuarios_lista = []
     for username, info in USUARIOS_DB.items():
         rol_nombre = ROLES_CONFIG.get(info.get('rol', ''), {}).get('nombre', info.get('rol', ''))
@@ -170,50 +153,17 @@ with tab2:
         })
     
     usuarios_df = pd.DataFrame(usuarios_lista)
+    st.dataframe(usuarios_df, width='stretch', hide_index=True)
     
-    st.dataframe(usuarios_df, use_container_width=True, hide_index=True)
-    
-    # Solo el administrador supremo puede gestionar usuarios
-    if usuario_actual == "luis_admin":
-        st.subheader("🔧 Gestión Avanzada de Usuarios")
-        
-        col_add, col_edit, col_del = st.columns(3)
-        
-        with col_add:
-            with st.expander("➕ Agregar Nuevo Usuario"):
-                nuevo_usuario = st.text_input("Nombre de usuario")
-                nuevo_nombre = st.text_input("Nombre completo")
-                nuevo_rol = st.selectbox("Rol", ["inspector", "administrador", "demo"])
-                nueva_pass = st.text_input("Contraseña", type="password")
-                
-                if st.button("Crear Usuario", type="primary"):
-                    if nuevo_usuario and nueva_pass:
-                        st.success(f"Usuario '{nuevo_usuario}' creado (simulación)")
-                        st.info("En producción, esto actualizaría la base de datos")
-                    else:
-                        st.error("Completa todos los campos")
-        
-        with col_edit:
-            with st.expander("✏️ Editar Usuario"):
-                usuario_editar = st.selectbox("Seleccionar usuario", list(USUARIOS_DB.keys()))
-                if usuario_editar:
-                    st.info(f"Editando: {usuario_editar}")
-                    nueva_pass_edit = st.text_input("Nueva contraseña", type="password")
-                    if st.button("Actualizar Contraseña"):
-                        st.success(f"Contraseña actualizada para '{usuario_editar}' (simulación)")
-        
-        with col_del:
-            with st.expander("🗑️ Eliminar Usuario"):
-                usuario_eliminar = st.selectbox("Usuario a eliminar", 
-                                               [u for u in USUARIOS_DB.keys() if u != "luis_admin"])
-                if usuario_eliminar:
-                    st.warning(f"⚠️ Eliminar usuario: {usuario_eliminar}")
-                    confirmar = st.checkbox("Confirmar eliminación")
-                    if confirmar and st.button("Eliminar Usuario", type="secondary"):
-                        st.error(f"Usuario '{usuario_eliminar}' eliminado (simulación)")
-                        st.info("En producción, esto eliminaría el usuario permanentemente")
-    else:
-        st.info("ℹ️ Solo el Administrador Supremo puede gestionar usuarios.")
+    # Estadísticas
+    stats = obtener_estadisticas_usuarios()
+    col_stat1, col_stat2, col_stat3 = st.columns(3)
+    with col_stat1:
+        st.metric("Total Usuarios", stats["total_usuarios"])
+    with col_stat2:
+        st.metric("Usuarios Activos", stats["usuarios_activos"])
+    with col_stat3:
+        st.metric("Usuarios Bloqueados", stats["usuarios_bloqueados"])
 
 with tab3:
     st.header("📈 Análisis de Uso")
@@ -227,14 +177,14 @@ with tab3:
             cat_counts = df_categorias['categoria'].value_counts().reset_index()
             cat_counts.columns = ['categoria', 'count']
             
-            fig_cat = px.pie(
-                cat_counts,
-                values='count',
-                names='categoria',
-                title='Consultas por Categoría Principal',
-                hole=0.3
-            )
-            st.plotly_chart(fig_cat, use_container_width=True)
+            # Mostrar como tabla y bar chart
+            col_cat1, col_cat2 = st.columns([2, 1])
+            
+            with col_cat1:
+                st.bar_chart(cat_counts.set_index('categoria')['count'])
+            
+            with col_cat2:
+                st.dataframe(cat_counts)
             
             # Análisis por dependencia
             st.subheader("🏢 Dependencias Más Consultadas")
@@ -243,31 +193,8 @@ with tab3:
             dep_counts = df_deps['dependencia'].value_counts().head(10).reset_index()
             dep_counts.columns = ['dependencia', 'count']
             
-            fig_deps = px.bar(
-                dep_counts,
-                x='count',
-                y='dependencia',
-                title='Top 10 Dependencias',
-                orientation='h'
-            )
-            fig_deps.update_layout(yaxis={'categoryorder': 'total ascending'})
-            st.plotly_chart(fig_deps, use_container_width=True)
+            st.dataframe(dep_counts)
             
-            # Análisis temporal detallado
-            st.subheader("🕒 Patrones de Uso")
-            if 'timestamp' in df_consultas.columns:
-                df_consultas['hora'] = pd.to_datetime(df_consultas['timestamp']).dt.hour
-                horas_counts = df_consultas['hora'].value_counts().sort_index().reset_index()
-                horas_counts.columns = ['hora', 'consultas']
-                
-                fig_horas = px.bar(
-                    horas_counts,
-                    x='hora',
-                    y='consultas',
-                    title='Consultas por Hora del Día',
-                    labels={'hora': 'Hora', 'consultas': 'Número de Consultas'}
-                )
-                st.plotly_chart(fig_horas, use_container_width=True)
         else:
             st.info("No hay datos de consultas para análisis")
     except Exception as e:
@@ -280,12 +207,12 @@ with tab4:
     
     with col_config1:
         st.subheader("Configuración RAG")
-        st.slider("Número de chunks a recuperar", 1, 10, 3, key="rag_chunks")
-        st.slider("Umbral de relevancia", 0.0, 1.0, 0.7, key="rag_threshold")
+        chunks_recuperar = st.slider("Número de chunks a recuperar", 1, 10, 3)
+        umbral_relevancia = st.slider("Umbral de relevancia", 0.0, 1.0, 0.7)
         
         st.subheader("Configuración Gemini")
-        temperatura = st.slider("Temperatura", 0.0, 1.0, 0.1, 0.1, key="gemini_temp")
-        max_tokens = st.slider("Tokens máximos", 100, 8000, 4000, 100, key="gemini_tokens")
+        temperatura = st.slider("Temperatura", 0.0, 1.0, 0.1, 0.1)
+        max_tokens = st.slider("Tokens máximos", 100, 8000, 4000, 100)
         
         if st.button("💾 Guardar Configuración", type="primary"):
             st.success("Configuración guardada (simulación)")
@@ -299,80 +226,14 @@ with tab4:
             index=0
         )
         
-        if almacenamiento == "Google Sheets":
-            st.text_input("Spreadsheet ID", key="sheets_id")
-            st.text_area("Credenciales JSON", key="sheets_creds", height=100)
-        
         st.subheader("Notificaciones")
-        st.checkbox("Notificar consultas de riesgo", value=True, key="notify_risk")
-        st.checkbox("Notificar uso anómalo", value=True, key="notify_anomaly")
-        st.text_input("Email para notificaciones", key="notify_email")
+        notify_risk = st.checkbox("Notificar consultas de riesgo", value=True)
+        notify_anomaly = st.checkbox("Notificar uso anómalo", value=True)
+        notify_email = st.text_input("Email para notificaciones", value="admin@zapopan.gob.mx")
         
         if st.button("🔄 Reiniciar Sistema", type="secondary"):
             st.warning("Reiniciando sistema... (simulación)")
             st.info("El sistema se reiniciará en 5 segundos")
-
-with tab5:
-    st.header("🔒 Seguridad y Auditoría")
-    
-    st.subheader("Registro de Auditoría")
-    try:
-        # Mostrar últimas consultas como registro
-        if consultas:
-            audit_df = pd.DataFrame(consultas[-20:])  # Últimas 20 consultas
-            if 'timestamp' in audit_df.columns and 'usuario_real' in audit_df.columns:
-                display_cols = ['timestamp', 'usuario_real', 'categoria_principal', 'dependencia_responsable']
-                display_cols = [c for c in display_cols if c in audit_df.columns]
-                
-                st.dataframe(
-                    audit_df[display_cols].sort_values('timestamp', ascending=False),
-                    use_container_width=True
-                )
-            else:
-                st.info("No hay datos de auditoría completos")
-        else:
-            st.info("No hay registros de auditoría")
-    except:
-        st.info("No hay registros de auditoría disponibles")
-    
-    st.subheader("Reportes de Seguridad")
-    col_rep1, col_rep2 = st.columns(2)
-    
-    with col_rep1:
-        if st.button("📋 Generar Reporte Diario", use_container_width=True):
-            st.success("Reporte diario generado (simulación)")
-            st.download_button(
-                "Descargar Reporte",
-                data="Reporte de seguridad - Simulación",
-                file_name=f"reporte_seguridad_{datetime.now().strftime('%Y%m%d')}.txt"
-            )
-    
-    with col_rep2:
-        if st.button("🔍 Auditoría Completa", use_container_width=True):
-            st.success("Auditoría completada (simulación)")
-            st.info("No se encontraron vulnerabilidades críticas")
-    
-    # Solo para administrador supremo
-    if usuario_actual == "luis_admin":
-        st.subheader("🚨 Acciones Críticas de Seguridad")
-        
-        with st.expander("Rotación de Credenciales", icon="🔄"):
-            st.warning("Esta acción desactivará todas las API Keys actuales")
-            if st.button("🔄 Rotar Todas las API Keys", type="secondary"):
-                st.error("⚠️ Acción crítica - Requiere confirmación adicional")
-                confirm = st.checkbox("Confirmo que quiero rotar todas las API Keys")
-                if confirm:
-                    st.success("API Keys rotadas (simulación)")
-        
-        with st.expander("Exportar Todos los Datos", icon="💾"):
-            st.info("Exporta todos los datos del sistema para backup")
-            if st.button("📦 Exportar Backup Completo", type="primary"):
-                st.success("Backup generado (simulación)")
-                st.download_button(
-                    "Descargar Backup",
-                    data="Backup completo del sistema - Simulación",
-                    file_name=f"backup_zapopan_{datetime.now().strftime('%Y%m%d_%H%M')}.zip"
-                )
 
 # Footer
 st.markdown("---")

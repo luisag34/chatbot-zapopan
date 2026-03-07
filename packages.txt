@@ -1,5 +1,0 @@
-# Streamlit Cloud necesita este archivo para instalar dependencias
-# Este archivo es un alias para requirements.txt
-
-# Las dependencias están en requirements.txt
-# Streamlit Cloud leerá automáticamente requirements.txt

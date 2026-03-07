@@ -9,7 +9,7 @@ Integración completa: RAG + Router Semántico + Google AI Studio + Auditoría
 """
 
 import streamlit as st
-import google.generativeai as genai
+import google.genai as genai
 import json
 import pandas as pd
 from datetime import datetime
@@ -524,7 +524,7 @@ with st.sidebar:
                     })
                 
                 df_usuarios = pd.DataFrame(usuarios_lista)
-                st.dataframe(df_usuarios, use_container_width=True, hide_index=True)
+                st.dataframe(df_usuarios, width='stretch', hide_index=True)
                 
                 # Estadísticas
                 stats = obtener_estadisticas_usuarios()
@@ -612,7 +612,7 @@ with st.sidebar:
                     
                     with col_acc1:
                         if info_usuario["estado"] == "activo":
-                            if st.button("🚫 Bloquear Usuario", use_container_width=True, type="secondary"):
+                            if st.button("🚫 Bloquear Usuario", width='stretch', type="secondary"):
                                 success, msg = bloquear_usuario(usuario_gestionar)
                                 if success:
                                     st.success(msg)
@@ -620,7 +620,7 @@ with st.sidebar:
                                 else:
                                     st.error(msg)
                         else:
-                            if st.button("✅ Activar Usuario", use_container_width=True, type="primary"):
+                            if st.button("✅ Activar Usuario", width='stretch', type="primary"):
                                 success, msg = activar_usuario(usuario_gestionar)
                                 if success:
                                     st.success(msg)
@@ -629,7 +629,7 @@ with st.sidebar:
                                     st.error(msg)
                     
                     with col_acc2:
-                        if st.button("🔄 Cambiar Contraseña", use_container_width=True):
+                        if st.button("🔄 Cambiar Contraseña", width='stretch'):
                             nueva_pass = st.text_input("Nueva contraseña", type="password", key=f"new_pass_{usuario_gestionar}")
                             confirm_pass = st.text_input("Confirmar", type="password", key=f"confirm_pass_{usuario_gestionar}")
                             if st.button("💾 Guardar", key=f"save_pass_{usuario_gestionar}"):
@@ -641,7 +641,7 @@ with st.sidebar:
                                         st.error(msg)
                     
                     with col_acc3:
-                        if st.button("🗑️ Eliminar Usuario", use_container_width=True, type="secondary"):
+                        if st.button("🗑️ Eliminar Usuario", width='stretch', type="secondary"):
                             st.warning(f"⚠️ ¿Eliminar permanentemente a '{usuario_gestionar}'?")
                             confirmar = st.checkbox("Confirmar eliminación permanente")
                             if confirmar:
@@ -786,7 +786,7 @@ if not st.session_state.autenticado:
         
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
-            if st.button("🚪 Ingresar", type="primary", use_container_width=True):
+            if st.button("🚪 Ingresar", type="primary", width='stretch'):
                 # Verificar credenciales y estado del usuario
                 if user in USUARIOS_DB:
                     user_info = USUARIOS_DB[user]
@@ -812,7 +812,7 @@ if not st.session_state.autenticado:
                     st.error("❌ Usuario no encontrado")
         
         with col_btn2:
-            if st.button("🆘 Ayuda", use_container_width=True):
+            if st.button("🆘 Ayuda", width='stretch'):
                 st.info("""
                 **Soporte técnico:**  
                 Contacta al administrador del sistema para obtener credenciales.
