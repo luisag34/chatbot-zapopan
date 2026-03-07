@@ -17,8 +17,15 @@ except ImportError:
     FALLBACK_MEJORADO_AVAILABLE = False
     st.warning("⚠️ Módulo fallback mejorado no disponible.")
 
-# Sistema híbrido definitivo (fallback garantizado + IA optimizada si funciona)
-CHATBOT_MODULE_AVAILABLE = True  # Sistema híbrido siempre disponible
+# Vertex AI (solución profesional - requiere configuración)
+try:
+    from vertex_ai_integration import procesar_consulta_vertex_ai
+    VERTEX_AI_AVAILABLE = True
+except ImportError:
+    VERTEX_AI_AVAILABLE = False
+
+# Sistema híbrido definitivo (fallback garantizado)
+CHATBOT_MODULE_AVAILABLE = True  # Sistema siempre disponible
 
 # ============================================================================
 # CONFIGURACIÓN BÁSICA
@@ -490,18 +497,27 @@ def procesar_consulta_local(consulta: str, usuario: str):
     }
 
 def procesar_consulta_con_chatbot_zapopan(consulta: str, usuario: str):
-    """Procesar consulta usando sistema híbrido definitivo"""
+    """Procesar consulta con sistema jerárquico: Vertex AI → Híbrido → Fallback"""
     
-    # Usar sistema híbrido definitivo (fallback garantizado + IA optimizada si funciona)
+    # Paso 1: Intentar Vertex AI (solución profesional)
+    if VERTEX_AI_AVAILABLE:
+        resultado = procesar_consulta_vertex_ai(consulta, usuario)
+        if resultado.get("usando_ai", False):
+            return resultado
+        # Si Vertex AI falló pero devolvió fallback, usarlo
+        if resultado.get("fuente") == "fallback_mejorado":
+            return resultado
+    
+    # Paso 2: Sistema híbrido (IA optimizada + fallback)
     try:
         from chatbot_zapopan_hibrido import procesar_consulta_hibrida
         return procesar_consulta_hibrida(consulta, usuario)
     except ImportError:
-        # Fallback al sistema mejorado si no está disponible
+        # Paso 3: Fallback al sistema mejorado
         if FALLBACK_MEJORADO_AVAILABLE:
             return procesar_consulta_hibrida(consulta, usuario, intentar_chatbot=False)
         
-        # Último fallback
+        # Paso 4: Último fallback
         return procesar_consulta_local(consulta, usuario)
 
 def registrar_consulta_local(consulta: str, resultados: list, usuario: str):
@@ -675,13 +691,15 @@ def main():
                 fuente = resultado.get("fuente", "")
                 calidad = resultado.get("calidad", "")
                 
-                if fuente == "gemini_optimizado":
+                if fuente == "vertex_ai":
+                    st.caption("🚀 Vertex AI • 🔧 Solución profesional Google Cloud")
+                elif fuente == "gemini_optimizado":
                     if calidad == "excelente":
-                        st.caption("🤖 Respuesta IA optimizada • ✅ Excelente calidad")
+                        st.caption("🤖 IA optimizada • ✅ Excelente calidad")
                     elif calidad == "buena":
-                        st.caption("🤖 Respuesta IA optimizada • 👍 Buena calidad")
+                        st.caption("🤖 IA optimizada • 👍 Buena calidad")
                     elif calidad == "aceptable":
-                        st.caption("🤖 Respuesta IA optimizada • ⚠️ Calidad aceptable")
+                        st.caption("🤖 IA optimizada • ⚠️ Calidad aceptable")
                 elif fuente == "fallback_mejorado":
                     st.caption("📋 Sistema normativo Zapopan • 🛡️ Respuesta garantizada")
                 else:
