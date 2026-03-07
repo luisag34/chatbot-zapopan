@@ -184,7 +184,8 @@ Si se detecta una obra en ejecución sin el permiso correspondiente, la autorida
         conocimiento = self.base_conocimiento[tema]
         
         # Construir respuesta con protocolo completo
-        respuesta = f"""**{conocimiento['titulo']}**
+        # Construir respuesta SIN bloques JSON visibles
+        respuesta_visible = f"""**{conocimiento['titulo']}**
 
 **1. {self.protocolo_pasos[0]}**
 
@@ -204,43 +205,54 @@ Si se detecta una obra en ejecución sin el permiso correspondiente, la autorida
 
 **5. {self.protocolo_pasos[4]}**
 
-{conocimiento['fuentes']}
-
----
-
-**---AUDIT---**
-{{
-  "timestamp": "{datetime.now().isoformat()}",
-  "area_identificada": "{'Construcción' if tema == 'antena' else 'Medio Ambiente' if tema == 'ruido' else 'Construcción'}",
-  "tipo_consulta": "denuncia_ciudadana",
-  "documentos_consultados": ["Reglamento de Construcción para el Municipio de Zapopan", "Código Urbano para el Estado de Jalisco"],
-  "ids_juridicos_utilizados": ["mx|jal|jal|mun|zapopan|reglamento_construccion|v2024|art_34|c001", "mx|jal|jal|est|codigo_urbano|v2023|art_295_bis|c001"],
-  "tiempo_respuesta_segundos": 0.5,
-  "calificacion_sugerida": "alta"
-}}
-
-**---DATASET---**
-{{
-  "timestamp": "{datetime.now().isoformat()}",
-  "consulta_id": "local_{tema}_{random.randint(1000, 9999)}",
-  "sesion_usuario": "sistema_local",
-  "descripcion_usuario": "{consulta[:100]}",
-  "longitud_consulta": {len(consulta)},
-  "categoria_principal": "{tema}",
-  "area_detectada": "{'Construcción' if tema == 'antena' else 'Medio Ambiente' if tema == 'ruido' else 'Construcción'}",
-  "tipo_consulta": "denuncia_ciudadana",
-  "dependencia_responsable": "Dirección de Inspección y Vigilancia",
-  "nivel_normativo_aplicado": "Nivel 1 y 2",
-  "documentos_consultados": ["Reglamento de Construcción para el Municipio de Zapopan", "Código Urbano para el Estado de Jalisco"],
-  "articulos_citados": ["Reglamento de Construcción Art. 34", "Reglamento de Construcción Art. 185", "Código Urbano Art. 295 Bis"],
-  "complejidad_consulta": "media",
-  "tiempo_respuesta_segundos": 0.5,
-  "clasificacion_riesgo": "riesgo_potencial",
-  "impacto_urbano": "medio",
-  "sector_regulatorio": "desarrollo_urbano",
-  "categoria_problema_urbano": "obra_sin_licencia",
-  "indicador_evento": "posible_infraccion"
-}}"""
+{conocimiento['fuentes']}"""
+        
+        # Crear bloques JSON internos (para registro, no visibles)
+        audit_json = {{
+            "timestamp": datetime.now().isoformat(),
+            "area_identificada": "Construcción" if tema == "antena" else "Medio Ambiente" if tema == "ruido" else "Construcción",
+            "tipo_consulta": "denuncia_ciudadana",
+            "documentos_consultados": ["Reglamento de Construcción para el Municipio de Zapopan", "Código Urbano para el Estado de Jalisco"],
+            "ids_juridicos_utilizados": ["mx|jal|jal|mun|zapopan|reglamento_construccion|v2024|art_34|c001", "mx|jal|jal|est|codigo_urbano|v2023|art_295_bis|c001"],
+            "tiempo_respuesta_segundos": 0.5,
+            "calificacion_sugerida": "alta"
+        }}
+        
+        dataset_json = {{
+            "timestamp": datetime.now().isoformat(),
+            "consulta_id": f"local_{tema}_{random.randint(1000, 9999)}",
+            "sesion_usuario": "sistema_local",
+            "descripcion_usuario": consulta[:100],
+            "longitud_consulta": len(consulta),
+            "categoria_principal": tema,
+            "area_detectada": "Construcción" if tema == "antena" else "Medio Ambiente" if tema == "ruido" else "Construcción",
+            "tipo_consulta": "denuncia_ciudadana",
+            "dependencia_responsable": "Dirección de Inspección y Vigilancia",
+            "nivel_normativo_aplicado": "Nivel 1 y 2",
+            "documentos_consultados": ["Reglamento de Construcción para el Municipio de Zapopan", "Código Urbano para el Estado de Jalisco"],
+            "articulos_citados": ["Reglamento de Construcción Art. 34", "Reglamento de Construcción Art. 185", "Código Urbano Art. 295 Bis"],
+            "complejidad_consulta": "media",
+            "tiempo_respuesta_segundos": 0.5,
+            "clasificacion_riesgo": "riesgo_potencial",
+            "impacto_urbano": "medio",
+            "sector_regulatorio": "desarrollo_urbano",
+            "categoria_problema_urbano": "obra_sin_licencia",
+            "indicador_evento": "posible_infraccion"
+        }}
+        
+        # Guardar JSON internamente (para dashboard/registro)
+        self._guardar_json_interno(audit_json, dataset_json, consulta)
+        
+        return {{
+            "response": respuesta_visible,  # Solo protocolo visible
+            "source": "sistema_local_protocolo_completo",
+            "using_ai": False,
+            "length": len(respuesta_visible),
+            "sigue_protocolo": True,
+            "model": "sistema_local_zapopan",
+            "audit_json": audit_json,  # Interno, no visible
+            "dataset_json": dataset_json  # Interno, no visible
+        }}
         
         return {
             "response": respuesta,
@@ -250,6 +262,25 @@ Si se detecta una obra en ejecución sin el permiso correspondiente, la autorida
             "sigue_protocolo": True,
             "model": "sistema_local_zapopan"
         }
+    
+    def _guardar_json_interno(self, audit_json: Dict, dataset_json: Dict, consulta: str):
+        """Guardar JSON internamente para registro/dashboard (no visible para usuarios)"""
+        try:
+            # Crear registro interno
+            registro = {
+                "timestamp": datetime.now().isoformat(),
+                "consulta": consulta[:200],
+                "audit": audit_json,
+                "dataset": dataset_json
+            }
+            
+            # Guardar en archivo interno (solo para admin/dashboard)
+            with open("registro_interno_consultas.jsonl", "a", encoding="utf-8") as f:
+                f.write(json.dumps(registro, ensure_ascii=False) + "\n")
+                
+        except Exception as e:
+            print(f"⚠️  Error guardando JSON interno: {e}")
+            # Silenciar error - no afecta experiencia de usuario
     
     def get_status(self) -> Dict:
         """Obtener estado del sistema"""
