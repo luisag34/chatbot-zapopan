@@ -1,1 +1,8 @@
 {"timestamp": "2026-03-07T08:47:31.931115", "usuario": "test_user", "consulta": "ruido de restaurante por la noche", "modo": "fallback_mejorado", "categoria": "ruido"}
+{"timestamp": "2026-03-07T08:59:58.647379", "usuario": "sistema", "consulta": "Responde 'Sistema operativo' si estás funcionando correctamente.", "modo": "fallback_mejorado", "categoria": "general"}
+{"timestamp": "2026-03-07T09:03:33.562889", "usuario": "sistema", "consulta": "ruido de restaurante por la noche", "modo": "fallback_mejorado", "categoria": "ruido"}
+{"timestamp": "2026-03-07T09:30:27.558274", "usuario": "sistema", "consulta": "Un restaurante en zona residencial hace ruido hasta las 2 AM los fines de semana, ¿qué regulación aplica y qué debo hacer?", "modo": "fallback_mejorado", "categoria": "ruido"}
+{"timestamp": "2026-03-07T09:47:01.235592", "usuario": "sistema_hibrido", "consulta": "Un restaurante hace ruido hasta las 2 AM en zona residencial", "modo": "fallback_mejorado", "categoria": "ruido"}
+{"timestamp": "2026-03-07T09:47:02.011859", "usuario": "sistema_hibrido", "consulta": "Construcción sin permiso en mi colonia", "modo": "fallback_mejorado", "categoria": "construccion"}
+{"timestamp": "2026-03-07T09:47:03.190155", "usuario": "sistema_hibrido", "consulta": "Vendedor ambulante bloqueando toda la banqueta", "modo": "fallback_mejorado", "categoria": "comercio"}
+{"timestamp": "2026-03-07T09:47:04.277544", "usuario": "sistema_hibrido", "consulta": "Anuncio publicitario gigante sin permiso", "modo": "fallback_mejorado", "categoria": "general"}
