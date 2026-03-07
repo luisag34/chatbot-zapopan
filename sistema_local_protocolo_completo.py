@@ -243,7 +243,7 @@ Si se detecta una obra en ejecución sin el permiso correspondiente, la autorida
         # Guardar JSON internamente (para dashboard/registro)
         self._guardar_json_interno(audit_json, dataset_json, consulta)
         
-        return {{
+        return {
             "response": respuesta_visible,  # Solo protocolo visible
             "source": "sistema_local_protocolo_completo",
             "using_ai": False,
@@ -252,7 +252,7 @@ Si se detecta una obra en ejecución sin el permiso correspondiente, la autorida
             "model": "sistema_local_zapopan",
             "audit_json": audit_json,  # Interno, no visible
             "dataset_json": dataset_json  # Interno, no visible
-        }}
+        }
         
         return {
             "response": respuesta,
