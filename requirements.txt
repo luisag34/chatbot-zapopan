@@ -1,4 +1,8 @@
 # SOLO STREAMLIT - NADA MÁS
-# Streamlit Cloud ya incluye pandas, numpy, etc.
+# Versiones compatibles con Python 3.14.3 de Streamlit Cloud
 
 streamlit==1.55.0
+
+# NOTA: NO incluir google-genai - causa errores
+# NOTA: NO incluir pandas/numpy - vienen con Streamlit
+# NOTA: Streamlit Cloud ya instala todo lo necesario
