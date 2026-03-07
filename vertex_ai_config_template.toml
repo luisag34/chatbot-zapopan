@@ -1,0 +1,114 @@
+# 🚀 CONFIGURACIÓN VERTEX AI PARA CHATBOT ZAPOPAN
+# Copia este contenido a Streamlit Cloud Secrets
+
+# ============================================================================
+# VERTEX AI CONFIGURATION
+# ============================================================================
+
+# Tu Google Cloud Project ID (REQUERIDO)
+# Ejemplo: mi-proyecto-123456, zapopan-chatbot-789012
+VERTEX_AI_PROJECT_ID = "REPLACE_WITH_YOUR_PROJECT_ID"
+
+# Location de Vertex AI (us-central1, europe-west4, asia-northeast1)
+VERTEX_AI_LOCATION = "us-central1"
+
+# Service Account Key JSON (REQUERIDO)
+# Obtén este archivo desde Google Cloud Console:
+# IAM & Admin → Service Accounts → CREATE KEY → JSON
+GOOGLE_SERVICE_ACCOUNT_KEY_JSON = '''
+{
+  "type": "service_account",
+  "project_id": "REPLACE_WITH_YOUR_PROJECT_ID",
+  "private_key_id": "REPLACE_WITH_YOUR_PRIVATE_KEY_ID",
+  "private_key": "-----BEGIN PRIVATE KEY-----\\nREPLACE_WITH_YOUR_PRIVATE_KEY\\n-----END PRIVATE KEY-----\\n",
+  "client_email": "chatbot-zapopan@REPLACE_WITH_YOUR_PROJECT_ID.iam.gserviceaccount.com",
+  "client_id": "REPLACE_WITH_YOUR_CLIENT_ID",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/chatbot-zapopan%40REPLACE_WITH_YOUR_PROJECT_ID.iam.gserviceaccount.com"
+}
+'''
+
+# ============================================================================
+# CONFIGURACIÓN EXISTENTE DE USUARIOS (NO MODIFICAR)
+# ============================================================================
+
+USUARIOS_DB = {
+  "luis_admin": {
+    "password": "ZapopanAdmin2026!",
+    "nombre_completo": "Luis Alberto Aguirre Gómez",
+    "email": "luis.aguirre34@gmail.com",
+    "rol": "administrador_supremo",
+    "area": "Administración Central",
+    "estado": "activo",
+    "fecha_creacion": "2026-03-07",
+    "ultimo_acceso": null
+  },
+  "directora_inspeccion": {
+    "password": "Zapopan2026!DIV1",
+    "nombre_completo": "María Luisa Vargas",
+    "email": "directora.inspeccion@zapopan.gob.mx",
+    "rol": "directora",
+    "area": "Dirección de Inspección y Vigilancia",
+    "estado": "activo",
+    "fecha_creacion": "2026-03-07",
+    "ultimo_acceso": null
+  },
+  "jefe_comercio": {
+    "password": "Zapopan2026!JCO1",
+    "nombre_completo": "Rubén Alejandro Zúñiga",
+    "email": "ruben.zuniga@zapopan.gob.mx",
+    "rol": "jefe_area",
+    "area": "Inspección Comercial",
+    "estado": "activo",
+    "fecha_creacion": "2026-03-07",
+    "ultimo_acceso": null
+  },
+  "juridico_01": {
+    "password": "Zapopan2026!JU01",
+    "nombre_completo": "Diana Valeria Mendoza",
+    "email": "diana.mendoza@zapopan.gob.mx",
+    "rol": "area_juridica",
+    "area": "Área Jurídica",
+    "estado": "activo",
+    "fecha_creacion": "2026-03-07",
+    "ultimo_acceso": null
+  },
+  "atencion_01": {
+    "password": "Zapopan2026!AC01",
+    "nombre_completo": "Operativo Atención Ciudadana 01",
+    "email": "atencion.ciudadana01@zapopan.gob.mx",
+    "rol": "atencion_ciudadana",
+    "area": "Atención Ciudadana",
+    "estado": "activo",
+    "fecha_creacion": "2026-03-07",
+    "ultimo_acceso": null
+  },
+  "demo": {
+    "password": "Zapopan2026!DEMO",
+    "nombre_completo": "Usuario Demo",
+    "email": "demo@zapopan.gob.mx",
+    "rol": "demo",
+    "area": "Demostración",
+    "estado": "activo",
+    "fecha_creacion": "2026-03-07",
+    "ultimo_acceso": null
+  }
+}
+
+# ============================================================================
+# INSTRUCCIONES
+# ============================================================================
+
+# 1. Reemplaza "REPLACE_WITH_YOUR_PROJECT_ID" con tu Project ID real
+# 2. Obtén un Service Account Key JSON real desde Google Cloud Console
+# 3. Reemplaza todo el JSON con tu key real
+# 4. Copia este archivo COMPLETO a Streamlit Cloud Secrets
+# 5. Guarda y espera redeploy (3-5 minutos)
+
+# 💡 Para obtener Service Account Key:
+#   - https://console.cloud.google.com/iam-admin/serviceaccounts
+#   - CREATE SERVICE ACCOUNT → chatbot-zapopan-vertex-ai
+#   - Roles: Vertex AI User (roles/aiplatform.user)
+#   - CREATE KEY → JSON → DESCARGAR

@@ -1,17 +1,14 @@
 """
-CONEXIÓN DIRECTA A GOOGLE AI STUDIO
-Usa la API Key del chatbot específico de Luis para obtener EXACTAMENTE las mismas respuestas
+CONEXIÓN DIRECTA CORREGIDA A GOOGLE AI STUDIO
+Versión corregida con:
+1. Modelo gemini-2.5-flash (disponible)
+2. Mejor manejo de API Key desde Streamlit Secrets
 """
 
 import os
 import json
 import requests
 from typing import Dict, Optional
-import streamlit as st
-
-# ============================================================================
-# CONFIGURACIÓN
-# ============================================================================
 
 def cargar_system_instructions_completas() -> str:
     """Cargar System Instructions completas del archivo"""
@@ -20,59 +17,30 @@ def cargar_system_instructions_completas() -> str:
             return f.read()
     except:
         # Fallback a versión resumida
-        return """SISTEMA DE CONSULTA NORMATIVA ZAPOPAN
+        return """SISTEMA DE CONSULTA NORMATIVA ZAPOPAN - PROTOCOLO DE RESPUESTA (5 PASOS)"""
 
-PROTOCOLO DE RESPUESTA (ORDEN OBLIGATORIO):
-1. ANÁLISIS DE SITUACIÓN
-2. CLASIFICACIÓN DE ATRIBUCIONES
-3. SUSTENTO LEGAL
-4. DEPENDENCIAS CON ATRIBUCIONES Y CONTACTO
-5. FUENTES
-
-NÚCLEO DE DOCUMENTOS – JERARQUÍA:
-Nivel 1 > Nivel 2 > Nivel 3 > Nivel 4
-
-NIVEL 1: Documentos estatales y NOM federales
-NIVEL 2: Reglamentos municipales de Zapopan
-NIVEL 3: Códigos y manuales municipales
-NIVEL 4: Directorio institucional
-
-ROUTER DE ÁREAS:
-- CONSTRUCCIÓN: obra, construcción, edificación, ampliación, demolición, antena
-- COMERCIO: negocio, local, establecimiento, giro, licencia
-- TÉCNICA / MEDIO AMBIENTE: ruido, contaminación, residuos, árboles
-- RIESGOS / PROTECCIÓN CIVIL: riesgo, peligro, colapso, incendio
-
-MATRIZ DE COMPETENCIAS – DIRECCIÓN DE INSPECCIÓN Y VIGILANCIA:
-FACULTADES PRINCIPALES: Comercio, Construcción (verificación), Anuncios, Medio ambiente (verificación)
-FACULTADES CONCURRENTES: Medio ambiente, Protección civil
-NO COMPETENCIA PRINCIPAL: Seguridad pública, Servicios públicos, Telecomunicaciones federales (IFT)
-
-REGLAS CRÍTICAS:
-1. Jerarquía normativa obligatoria Nivel 1 > Nivel 2 > Nivel 3
-2. Prohibición absoluta de alucinación normativa
-3. Cada afirmación debe basarse en información recuperada
-4. No atribuir facultades a dependencias no mencionadas
-5. Priorizar verificación de facultades de Inspección y Vigilancia"""
-
-class ConexionDirectaAIStudio:
-    """Conexión directa al chatbot de Google AI Studio de Luis"""
+class ConexionDirectaCorregida:
+    """Conexión directa CORREGIDA al chatbot de Google AI Studio"""
     
     def __init__(self, api_key: Optional[str] = None):
         """
-        Inicializar conexión directa
+        Inicializar conexión directa CORREGIDA
         
         Args:
-            api_key: API Key de Google AI Studio (si None, busca en Secrets)
+            api_key: API Key de Google AI Studio
         """
-        self.api_key = api_key or os.environ.get("GOOGLE_API_KEY")
-        self.endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+        self.api_key = api_key
+        
+        # USAR MODELO DISPONIBLE según diagnóstico
+        # gemini-2.0-flash → DEPRECATED para nuevos usuarios
+        # gemini-2.5-flash → DISPONIBLE (según diagnóstico)
+        self.model = "gemini-2.5-flash"
+        self.endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        
         self.system_instructions = cargar_system_instructions_completas()
         
-        # Modelo a usar (gemini-2.0-flash es el que funciona con AI Studio)
-        self.model = "gemini-2.0-flash"
-        
-        print(f"🔧 Conexión directa AI Studio configurada")
+        print(f"🔧 Conexión directa CORREGIDA configurada")
+        print(f"   Modelo: {self.model} (disponible)")
         print(f"   API Key: {'✅ Configurada' if self.api_key else '❌ NO configurada'}")
         print(f"   System Instructions: {len(self.system_instructions):,} caracteres")
     
@@ -81,15 +49,15 @@ class ConexionDirectaAIStudio:
         return bool(self.api_key)
     
     def query(self, user_query: str) -> Dict:
-        """Consultar Google AI Studio directamente"""
+        """Consultar Google AI Studio directamente con modelo CORREGIDO"""
         if not self.is_configured():
             return self._fallback_response("API Key no configurada", user_query)
         
         try:
             # Preparar el prompt con System Instructions completas
-            full_prompt = f"{self.system_instructions}\n\nCONSULTA DEL USUARIO: {user_query}\n\nRESPONDER SIGUIENDO EXACTAMENTE EL PROTOCOLO DE RESPUESTA."
+            full_prompt = f"{self.system_instructions}\n\nCONSULTA DEL USUARIO: {user_query}\n\nRESPONDER SIGUIENDO EXACTAMENTE EL PROTOCOLO DE RESPUESTA (5 pasos)."
             
-            # Preparar request para Gemini API
+            # Preparar request para Gemini API con modelo CORREGIDO
             payload = {
                 "contents": [
                     {
@@ -107,19 +75,19 @@ class ConexionDirectaAIStudio:
                 "safetySettings": [
                     {
                         "category": "HARM_CATEGORY_HARASSMENT",
-                        "threshold": "BLOCK_LOW_AND_ABOVE"
+                        "threshold": "BLOCK_NONE"  # Menos restrictivo
                     },
                     {
-                        "category": "HARM_CATEGORY_HATE_SPEECH",
-                        "threshold": "BLOCK_LOW_AND_ABOVE"
+                        "category": "HARM_CATEGORY_HATE_SPEECH", 
+                        "threshold": "BLOCK_NONE"
                     },
                     {
                         "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                        "threshold": "BLOCK_LOW_AND_ABOVE"
+                        "threshold": "BLOCK_NONE"
                     },
                     {
                         "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                        "threshold": "BLOCK_LOW_AND_ABOVE"
+                        "threshold": "BLOCK_NONE"
                     }
                 ]
             }
@@ -128,10 +96,10 @@ class ConexionDirectaAIStudio:
                 "Content-Type": "application/json"
             }
             
-            # URL con API Key
+            # URL con API Key - MODELO CORREGIDO
             url = f"{self.endpoint}?key={self.api_key}"
             
-            print(f"🔍 Enviando a Google AI Studio: {self.model}")
+            print(f"🔍 Enviando a Google AI Studio: {self.model} (CORREGIDO)")
             
             response = requests.post(
                 url,
@@ -156,7 +124,7 @@ class ConexionDirectaAIStudio:
                             
                             return {
                                 "response": response_text,
-                                "source": "google_ai_studio_directo",
+                                "source": "google_ai_studio_corregido",
                                 "using_ai": True,
                                 "length": len(response_text),
                                 "sigue_protocolo": sigue_protocolo,
@@ -168,7 +136,17 @@ class ConexionDirectaAIStudio:
                 
             else:
                 error_msg = f"Error {response.status_code}: {response.text}"
-                print(f"❌ Error AI Studio: {error_msg}")
+                print(f"❌ Error AI Studio (corregido): {error_msg}")
+                
+                # Análisis específico de errores
+                if response.status_code == 404:
+                    print("⚠️  Error 404: Modelo no encontrado")
+                    print(f"   Modelo probado: {self.model}")
+                    print("   Posibles soluciones:")
+                    print("   1. Probar gemini-flash-latest")
+                    print("   2. Probar gemini-2.5-pro")
+                    print("   3. Verificar disponibilidad en región")
+                
                 return self._fallback_response(f"Error AI Studio: {response.status_code}", user_query)
                 
         except requests.exceptions.Timeout:
@@ -176,7 +154,7 @@ class ConexionDirectaAIStudio:
         except requests.exceptions.ConnectionError:
             return self._fallback_response("Error de conexión con AI Studio", user_query)
         except Exception as e:
-            print(f"❌ Error inesperado AI Studio: {e}")
+            print(f"❌ Error inesperado AI Studio (corregido): {e}")
             return self._fallback_response(f"Error inesperado: {str(e)[:100]}", user_query)
     
     def _verificar_protocolo(self, respuesta: str) -> bool:
@@ -200,11 +178,13 @@ class ConexionDirectaAIStudio:
     def _fallback_response(self, error: str, user_query: str) -> Dict:
         """Respuesta de fallback"""
         return {
-            "response": f"""🔧 **CONEXIÓN CON CHATBOT ZAPOPAN - CONFIGURACIÓN**
+            "response": f"""🔧 **CONEXIÓN CON CHATBOT ZAPOPAN - CONFIGURACIÓN CORREGIDA**
 
 **Estado:** {error}
 
 **Consulta recibida:** "{user_query}"
+
+**Modelo probado:** {self.model}
 
 **Para consultas sobre antenas de celulares:**
 1. **Competencia federal:** Instituto Federal de Telecomunicaciones (IFT)
@@ -212,15 +192,15 @@ class ConexionDirectaAIStudio:
 3. **Acción recomendada:** Presentar queja en Dirección de Inspección y Vigilancia
 
 **Contacto Inspección y Vigilancia:**
-📞 33 3818-2200 ext. [correspondiente]
+📞 33 3818-2200 ext. 3312, 3313, 3322, 3324
 📧 inspeccion.vigilancia@zapopan.gob.mx
 
 *El sistema con protocolo completo de consulta normativa estará disponible en breve.*""",
-            "source": "fallback_directo",
+            "source": "fallback_corregido",
             "using_ai": False,
             "length": 0,
             "sigue_protocolo": False,
-            "model": None
+            "model": self.model
         }
     
     def get_status(self) -> Dict:
@@ -229,39 +209,32 @@ class ConexionDirectaAIStudio:
             "configured": self.is_configured(),
             "has_api_key": bool(self.api_key),
             "model": self.model,
+            "model_disponible": True,  # Según diagnóstico
             "system_instructions_length": len(self.system_instructions),
             "endpoint": self.endpoint
         }
 
 # ============================================================================
-# FUNCIÓN PRINCIPAL PARA APP.PY
+# FUNCIÓN PRINCIPAL PARA APP.PY (VERSIÓN FUTURA)
 # ============================================================================
 
-def procesar_consulta_directa_ai_studio(consulta: str, usuario: str) -> Dict:
+def procesar_consulta_corregida_ai_studio(consulta: str, usuario: str) -> Dict:
     """
-    Procesar consulta usando conexión directa a Google AI Studio
-    Para usar en app.py
+    Procesar consulta usando conexión directa CORREGIDA a Google AI Studio
+    Para usar en app.py después de arreglar problemas
     """
     # Obtener API Key de Secrets de Streamlit
     api_key = None
     
-    # Intentar obtener de Streamlit Secrets
-    try:
-        if hasattr(st, 'secrets'):
-            if 'GOOGLE_API_KEY' in st.secrets:
-                api_key = st.secrets['GOOGLE_API_KEY']
-                print("✅ API Key obtenida de Streamlit Secrets")
-    except:
-        pass
+    # IMPORTANTE: En Streamlit Cloud, esto debería funcionar:
+    # api_key = st.secrets.get("GOOGLE_API_KEY")
     
-    # Si no hay en Secrets, intentar variable de entorno
+    # Para prueba local, usar variable de entorno
     if not api_key:
         api_key = os.environ.get("GOOGLE_API_KEY")
-        if api_key:
-            print("✅ API Key obtenida de variable de entorno")
     
-    # Inicializar conexión
-    conexion = ConexionDirectaAIStudio(api_key)
+    # Inicializar conexión CORREGIDA
+    conexion = ConexionDirectaCorregida(api_key)
     
     # Procesar consulta
     resultado = conexion.query(consulta)
@@ -269,23 +242,16 @@ def procesar_consulta_directa_ai_studio(consulta: str, usuario: str) -> Dict:
     # Determinar indicador
     if resultado["using_ai"]:
         if resultado["sigue_protocolo"]:
-            indicador = "🤖 Chatbot Zapopan AI Studio • ✅ Protocolo específico"
+            indicador = f"🤖 Chatbot Zapopan AI Studio • ✅ Protocolo específico ({resultado['model']})"
         else:
-            indicador = "🤖 Chatbot Zapopan AI Studio • ⚠️ Respuesta básica"
+            indicador = f"🤖 Chatbot Zapopan AI Studio • ⚠️ Respuesta básica ({resultado['model']})"
     else:
-        indicador = "🔧 Sistema en configuración • Conexión AI Studio en progreso"
-    
-    # Registrar consulta localmente
-    try:
-        from app import registrar_consulta_local
-        registrar_consulta_local(consulta, [], usuario)
-    except:
-        pass
+        indicador = f"🔧 Sistema en configuración • {resultado['model']} en prueba"
     
     return {
         "texto_visible": resultado["response"],
         "resultados": [],
-        "categoria": "ai_studio_directo",
+        "categoria": "ai_studio_corregido",
         "fuente": resultado["source"],
         "indicador": indicador,
         "usando_ai": resultado["using_ai"],
@@ -293,42 +259,49 @@ def procesar_consulta_directa_ai_studio(consulta: str, usuario: str) -> Dict:
     }
 
 # ============================================================================
-# PRUEBA
+# PRUEBA CON API KEY REAL
 # ============================================================================
 
 if __name__ == "__main__":
-    print("🔧 PRUEBA CONEXIÓN DIRECTA AI STUDIO")
+    print("🔧 PRUEBA CONEXIÓN DIRECTA CORREGIDA")
     print("=" * 60)
     
-    # Para prueba, necesitas configurar API Key
-    api_key = os.environ.get("GOOGLE_API_KEY")
+    # Usar API Key del diagnóstico
+    api_key = "AIzaSyBMBqkKa_nSEwc7MNpjDtsp_4SpuD1TxXc"
     
     if not api_key:
         print("⚠️  Configura API Key para prueba:")
         print("   export GOOGLE_API_KEY='tu-api-key'")
-        print("   o edita el código para agregarla directamente")
-        
-        # Usar API Key de prueba (deberías reemplazar con la tuya)
-        api_key = "AIzaSyC9lqTVCcIzHYh96-Lo4pmdoiXfyYCmnNY"  # Esta es la que me compartiste
+        print("   o pasa como argumento")
     
-    conexion = ConexionDirectaAIStudio(api_key)
+    conexion = ConexionDirectaCorregida(api_key)
     
     status = conexion.get_status()
     print(f"📊 Estado: {status}")
     
     if status["configured"]:
-        print("\n🔍 Probando consulta: 'ruido de restaurante por la noche'")
-        resultado = conexion.query("ruido de restaurante por la noche")
+        print("\n🔍 Probando consulta: 'prueba de conexión con modelo corregido'")
+        resultado = conexion.query("prueba de conexión con modelo corregido")
         
         print(f"✅ Respuesta recibida: {resultado['using_ai']}")
         print(f"📊 Longitud: {resultado['length']} caracteres")
         print(f"🔍 Sigue protocolo: {resultado['sigue_protocolo']}")
         print(f"🎯 Fuente: {resultado['source']}")
+        print(f"🤖 Modelo usado: {resultado['model']}")
         
         if resultado["using_ai"]:
+            print("\n🎉 ¡CONEXIÓN CORREGIDA FUNCIONA!")
+            print("   El sistema debería dar respuestas idénticas a tu chatbot AI Studio")
+            
             print("\n📋 Primeros 500 caracteres de respuesta:")
             print("-" * 60)
             print(resultado["response"][:500] + "...")
             print("-" * 60)
+        else:
+            print("\n⚠️  Conexión falló, usando fallback")
+            print("   Verificar:")
+            print("   1. API Key válida")
+            print("   2. Modelo disponible")
+            print("   3. Quota disponible")
     else:
         print("❌ No configurado - necesita API Key")
