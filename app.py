@@ -17,8 +17,8 @@ except ImportError:
     FALLBACK_MEJORADO_AVAILABLE = False
     st.warning("⚠️ Módulo fallback mejorado no disponible.")
 
-# Importar módulo del chatbot (OPCIONAL - temporalmente desactivado)
-CHATBOT_MODULE_AVAILABLE = False  # Temporalmente desactivado hasta debug
+# Sistema híbrido definitivo (fallback garantizado + IA optimizada si funciona)
+CHATBOT_MODULE_AVAILABLE = True  # Sistema híbrido siempre disponible
 
 # ============================================================================
 # CONFIGURACIÓN BÁSICA
@@ -490,14 +490,19 @@ def procesar_consulta_local(consulta: str, usuario: str):
     }
 
 def procesar_consulta_con_chatbot_zapopan(consulta: str, usuario: str):
-    """Procesar consulta usando sistema híbrido (fallback mejorado por ahora)"""
+    """Procesar consulta usando sistema híbrido definitivo"""
     
-    # TEMPORAL: Usar siempre fallback mejorado hasta debuggear chatbot
-    if FALLBACK_MEJORADO_AVAILABLE:
-        return procesar_consulta_hibrida(consulta, usuario, intentar_chatbot=False)
-    
-    # Fallback a procesamiento local original
-    return procesar_consulta_local(consulta, usuario)
+    # Usar sistema híbrido definitivo (fallback garantizado + IA optimizada si funciona)
+    try:
+        from chatbot_zapopan_hibrido import procesar_consulta_hibrida
+        return procesar_consulta_hibrida(consulta, usuario)
+    except ImportError:
+        # Fallback al sistema mejorado si no está disponible
+        if FALLBACK_MEJORADO_AVAILABLE:
+            return procesar_consulta_hibrida(consulta, usuario, intentar_chatbot=False)
+        
+        # Último fallback
+        return procesar_consulta_local(consulta, usuario)
 
 def registrar_consulta_local(consulta: str, resultados: list, usuario: str):
     """Registrar consulta localmente"""
@@ -660,7 +665,7 @@ def main():
         
         # Procesar consulta CON CHATBOT ZAPOPAN (si está disponible)
         with st.chat_message("assistant"):
-            with st.spinner("🤖 Consultando chatbot Zapopan..." if CHATBOT_MODULE_AVAILABLE else "🔍 Consultando regulaciones..."):
+            with st.spinner("🔍 Consultando sistema normativo Zapopan..."):
                 resultado = procesar_consulta_con_chatbot_zapopan(prompt, usuario_actual)
                 
                 # Mostrar respuesta
@@ -668,12 +673,19 @@ def main():
                 
                 # Mostrar indicador de fuente
                 fuente = resultado.get("fuente", "")
-                if fuente == "fallback_mejorado":
-                    st.caption("📋 Respuesta del sistema normativo Zapopan (modo local mejorado)")
-                elif resultado.get("usando_ai", False):
-                    st.caption("🤖 Respuesta del chatbot Zapopan (Google AI Studio)")
+                calidad = resultado.get("calidad", "")
+                
+                if fuente == "gemini_optimizado":
+                    if calidad == "excelente":
+                        st.caption("🤖 Respuesta IA optimizada • ✅ Excelente calidad")
+                    elif calidad == "buena":
+                        st.caption("🤖 Respuesta IA optimizada • 👍 Buena calidad")
+                    elif calidad == "aceptable":
+                        st.caption("🤖 Respuesta IA optimizada • ⚠️ Calidad aceptable")
+                elif fuente == "fallback_mejorado":
+                    st.caption("📋 Sistema normativo Zapopan • 🛡️ Respuesta garantizada")
                 else:
-                    st.caption("📚 Respuesta de base de conocimiento local")
+                    st.caption("📚 Sistema local • 🔧 Modo básico")
                 
                 # Actualizar contador
                 st.session_state.total_consultas += 1
@@ -711,7 +723,7 @@ def main():
         """)
     
     st.caption(f"Sistema Normativo Zapopan • Usuario: {usuario_actual} • {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    st.caption("ℹ️ Versión local - Consulta básica de regulaciones")
+    st.caption("🏰 Sistema híbrido definitivo - Fallback garantizado + IA optimizada cuando disponible")
 
 # ============================================================================
 # EJECUCIÓN
