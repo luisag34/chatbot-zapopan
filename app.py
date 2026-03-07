@@ -106,11 +106,10 @@ def main():
                         st.error("❌ Usuario o contraseña incorrectos")
                 
                 st.markdown("---")
-                st.markdown("**📋 Usuarios disponibles:**")
-                st.markdown("- `directora_inspeccion` / `Zapopan2026!DIV1`")
-                st.markdown("- `jefe_comercio` / `Zapopan2026!JCO1`")
-                st.markdown("- `juridico_01` / `Zapopan2026!JU01`")
-                st.markdown("- `demo` / `Zapopan2026!AC01`")
+                st.markdown("**ℹ️ Información de acceso:**")
+                st.markdown("- Sistema restringido al personal autorizado de la Dirección de Inspección y Vigilancia")
+                st.markdown("- Para solicitar acceso, contactar al administrador del sistema")
+                st.markdown("- Acceso mediante credenciales institucionales")
         
         return
     
