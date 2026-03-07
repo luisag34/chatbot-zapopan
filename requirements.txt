@@ -1,19 +1,4 @@
-# Dependencias MÍNIMAS y COMPROBADAS para Streamlit Cloud
-# Versiones compatibles con Python 3.14.3 (lo que usa Streamlit Cloud)
+# SOLO STREAMLIT - NADA MÁS
+# Streamlit Cloud ya incluye pandas, numpy, etc.
 
-# CORE - ABSOLUTAMENTE NECESARIAS
 streamlit==1.55.0
-pandas==2.3.3
-numpy==2.4.2
-
-# Google AI - versión ACTUAL (no deprecated)
-google-genai==0.8.6
-
-# UTILITIES BÁSICAS
-requests==2.32.5
-python-dateutil==2.9.0.post0
-pytz==2026.1.post1
-
-# NOTA: NO INCLUIR plotly - causa errores de instalación
-# NOTA: NO INCLUIR gspread/google-auth - causan conflictos
-# NOTA: Streamlit Cloud ya incluye muchas dependencias básicas
