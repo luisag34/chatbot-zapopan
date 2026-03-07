@@ -208,7 +208,7 @@ Si se detecta una obra en ejecución sin el permiso correspondiente, la autorida
 {conocimiento['fuentes']}"""
         
         # Crear bloques JSON internos (para registro, no visibles)
-        audit_json = {{
+        audit_json = {
             "timestamp": datetime.now().isoformat(),
             "area_identificada": "Construcción" if tema == "antena" else "Medio Ambiente" if tema == "ruido" else "Construcción",
             "tipo_consulta": "denuncia_ciudadana",
@@ -216,9 +216,9 @@ Si se detecta una obra en ejecución sin el permiso correspondiente, la autorida
             "ids_juridicos_utilizados": ["mx|jal|jal|mun|zapopan|reglamento_construccion|v2024|art_34|c001", "mx|jal|jal|est|codigo_urbano|v2023|art_295_bis|c001"],
             "tiempo_respuesta_segundos": 0.5,
             "calificacion_sugerida": "alta"
-        }}
+        }
         
-        dataset_json = {{
+        dataset_json = {
             "timestamp": datetime.now().isoformat(),
             "consulta_id": f"local_{tema}_{random.randint(1000, 9999)}",
             "sesion_usuario": "sistema_local",
@@ -238,7 +238,7 @@ Si se detecta una obra en ejecución sin el permiso correspondiente, la autorida
             "sector_regulatorio": "desarrollo_urbano",
             "categoria_problema_urbano": "obra_sin_licencia",
             "indicador_evento": "posible_infraccion"
-        }}
+        }
         
         # Guardar JSON internamente (para dashboard/registro)
         self._guardar_json_interno(audit_json, dataset_json, consulta)
