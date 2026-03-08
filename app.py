@@ -8,43 +8,7 @@ import json
 from datetime import datetime
 from sistema_local_protocolo_completo import procesar_consulta_local_protocolo_completo
 
-
-    # ========================================================================
-    # ANALYTICS BÁSICO (uso interno)
-    # ========================================================================
-    
-    # Inicializar contadores si no existen
-    if "contador_consultas" not in st.session_state:
-        st.session_state.contador_consultas = 0
-        st.session_state.consultas_por_usuario = {}
-        st.session_state.ultima_consulta_hora = None
-    
-    # Función para registrar consulta
-    def registrar_consulta_analytics(usuario, consulta):
-        """Registrar métricas básicas de uso"""
-        try:
-            st.session_state.contador_consultas += 1
-            
-            if usuario not in st.session_state.consultas_por_usuario:
-                st.session_state.consultas_por_usuario[usuario] = 0
-            st.session_state.consultas_por_usuario[usuario] += 1
-            
-            st.session_state.ultima_consulta_hora = datetime.now().isoformat()
-            
-            # Solo admin puede ver analytics
-            if st.session_state.rol == "administrador_supremo":
-                with st.sidebar.expander("📊 Analytics (Admin)"):
-                    st.metric("Consultas totales", st.session_state.contador_consultas)
-                    if st.session_state.consultas_por_usuario:
-                        st.write("Consultas por usuario:")
-                        for user, count in st.session_state.consultas_por_usuario.items():
-                            st.write(f"  • {user}: {count}")
-                    if st.session_state.ultima_consulta_hora:
-                        st.caption(f"Última consulta: {st.session_state.ultima_consulta_hora[:19]}")
-        except:
-            pass  # Analytics no debe romper la aplicación
-    
-    # ============================================================================
+# ============================================================================
 # CONFIGURACIÓN
 # ============================================================================
 
@@ -52,14 +16,15 @@ st.set_page_config(
     page_title="Sistema de Consulta - Dirección de Inspección y Vigilancia",
     page_icon="🏛️",
     layout="wide"
-, layout="wide", initial_sidebar_state="expanded", menu_items=None)
+)
 
 # ============================================================================
 # SISTEMA DE DISEÑO 2026
 # ============================================================================
 
 st.markdown("""
-<style> /* CSS OPTIMIZADO CON CONTRASTE MEJORADO PARA MÓVIL - SISTEMA DE DISEÑO 2026 */
+<style>
+/* CSS OPTIMIZADO CON CONTRASTE MEJORADO PARA MÓVIL - SISTEMA DE DISEÑO 2026 */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -399,5 +364,257 @@ div[data-testid="stAlert"] > div {
   
   .stContainer, .stExpander {
     background: #111827 !important;
-    border: 2px solid #334155 !important; /* Bordes muy vis </style>
+    border: 2px solid #334155 !important; /* Bordes muy vis
+</style>
 """, unsafe_allow_html=True)
+
+# ============================================================================
+# AUTENTICACIÓN
+# ============================================================================
+
+USUARIOS_DB = {
+    "luis_admin": {"password": "ZapopanAdmin2026!", "rol": "administrador_supremo", "nombre": "Luis Aguirre"},
+    "directora_inspeccion": {"password": "Zapopan2026!DIV1", "rol": "directora", "nombre": "María Luisa Vargas"},
+    "jefe_comercio": {"password": "Zapopan2026!JCO1", "rol": "jefe_area", "nombre": "Rubén Alejandro Zúñiga"},
+    "juridico_01": {"password": "Zapopan2026!JU01", "rol": "area_juridica", "nombre": "Diana Valeria Mendoza"},
+    "demo": {"password": "Zapopan2026!AC01", "rol": "demo", "nombre": "Usuario Demo"}
+}
+
+def verificar_login(usuario: str, password: str) -> bool:
+    """Verificar credenciales"""
+    if usuario in USUARIOS_DB:
+        return USUARIOS_DB[usuario]["password"] == password
+    return False
+
+def obtener_rol(usuario: str) -> str:
+    """Obtener rol del usuario"""
+    return USUARIOS_DB.get(usuario, {}).get("rol", "demo")
+
+def obtener_nombre(usuario: str) -> str:
+    """Obtener nombre del usuario"""
+    return USUARIOS_DB.get(usuario, {}).get("nombre", "Usuario")
+
+# ============================================================================
+# FUNCIONES AUXILIARES
+# ============================================================================
+
+def registrar_consulta_local(consulta: str, resultados: list, usuario: str):
+    """Registrar consulta localmente"""
+    try:
+        registro = {
+            "timestamp": datetime.now().isoformat(),
+            "usuario": usuario,
+            "consulta": consulta,
+            "resultados_count": len(resultados),
+            "sistema": "local_emergencia"
+        }
+        
+        with open("consultas_local.jsonl", "a", encoding="utf-8") as f:
+            f.write(json.dumps(registro, ensure_ascii=False) + "\n")
+    except:
+        pass
+
+def limpiar_texto_consulta():
+    """Limpiar el texto de la consulta en session_state"""
+    if "consulta_actual" in st.session_state:
+        st.session_state.consulta_actual = ""
+
+# ============================================================================
+# INTERFAZ PRINCIPAL
+# ============================================================================
+
+def main():
+    """Aplicación principal"""
+    
+    # Inicializar sesión
+    if "autenticado" not in st.session_state:
+        st.session_state.autenticado = False
+        st.session_state.usuario = ""
+        st.session_state.rol = ""
+        st.session_state.nombre = ""
+        st.session_state.historial = []
+        st.session_state.consulta_actual = ""
+        st.session_state.resultado_actual = None
+    
+    # ========================================================================
+    # PANTALLA DE LOGIN
+    # ========================================================================
+    
+    if not st.session_state.autenticado:
+        st.title("Sistema de Consulta de la Dirección de Inspección y Vigilancia")
+        st.markdown("### Acceso Restringido - Personal Autorizado")
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        
+        with col2:
+            with st.container(border=True):
+                st.markdown("#### Iniciar Sesión")
+                
+                usuario = st.text_input("Usuario", placeholder="Ej: directora_inspeccion")
+                password = st.text_input("Contraseña", type="password", placeholder="Ej: Zapopan2026!DIV1")
+                
+                if st.button("Ingresar", type="primary", use_container_width=True):
+                    if verificar_login(usuario, password):
+                        st.session_state.autenticado = True
+                        st.session_state.usuario = usuario
+                        st.session_state.rol = obtener_rol(usuario)
+                        st.session_state.nombre = obtener_nombre(usuario)
+                        st.rerun()
+                    else:
+                        st.error("Usuario o contraseña incorrectos")
+                
+                st.markdown("---")
+                st.markdown("**Información de acceso:**")
+                st.markdown("- Sistema restringido al personal autorizado de la Dirección de Inspección y Vigilancia")
+                st.markdown("- Para solicitar acceso, contactar al administrador del sistema")
+                st.markdown("- Acceso mediante credenciales institucionales")
+        
+        return
+    
+    # ========================================================================
+    # PANTALLA PRINCIPAL (AUTENTICADO)
+    # ========================================================================
+    
+    # Sidebar - Columna desplegable izquierda
+    with st.sidebar:
+        st.markdown(f"### {st.session_state.nombre}")
+        st.markdown(f"**Rol:** {st.session_state.rol.replace('_', ' ').title()}")
+        st.markdown(f"**Sistema:** Local - Protocolo específico")
+        
+        st.markdown("---")
+        
+        # Botón Dashboard - SOLO para administrador_supremo
+        if st.session_state.rol == "administrador_supremo":
+            if st.button("Dashboard", use_container_width=True):
+                st.info("Funcionalidad de Dashboard en desarrollo")
+        
+        # Botón App
+        if st.button("App", use_container_width=True):
+            st.info("Aplicación principal activa")
+        
+        st.markdown("---")
+        
+        # Historial de consultas recientes (en sidebar como solicitado)
+        if st.session_state.historial:
+            with st.expander("Historial de consultas recientes", expanded=False):
+                for i, consulta in enumerate(reversed(st.session_state.historial[-5:])):
+                    st.markdown(f"{i+1}. {consulta[:80]}..." if len(consulta) > 80 else f"{i+1}. {consulta}")
+        
+        st.markdown("---")
+        
+        # Botón cerrar sesión
+        if st.button("Cerrar Sesión", use_container_width=True):
+            st.session_state.autenticado = False
+            st.session_state.usuario = ""
+            st.session_state.rol = ""
+            st.session_state.nombre = ""
+            st.session_state.historial = []
+            st.session_state.consulta_actual = ""
+            st.session_state.resultado_actual = None
+            st.rerun()
+    
+    # Área principal
+    st.title("Sistema de Consulta de la Dirección de Inspección y Vigilancia")
+    st.markdown(f"### Bienvenido(a), {st.session_state.nombre}")
+    
+    # Inicializar historial si no existe
+    if "historial" not in st.session_state:
+        st.session_state.historial = []
+    
+    # Área de consulta
+    st.markdown("### Tu consulta")
+    
+    # Usar text_input con key para manejar estado
+    consulta = st.text_area(
+        "Describe tu consulta sobre normativa de Zapopan:",
+        value=st.session_state.get("consulta_actual", ""),
+        placeholder="Ej: Están colocando una antena de celulares en la azotea de mi vecino...",
+        height=100,
+        key="consulta_input"
+    )
+    
+    # Actualizar session_state
+    st.session_state.consulta_actual = consulta
+    
+    col1, col2 = st.columns([3, 1])
+    
+    with col1:
+        if st.button("Consultar", type="primary", use_container_width=True):
+            if consulta.strip():
+                with st.spinner("Procesando consulta..."):
+                    # Procesar con sistema local
+                    resultado = procesar_consulta_local_protocolo_completo(consulta, st.session_state.usuario)
+                    
+                    # Guardar en historial
+                    st.session_state.historial.append(consulta)
+                    st.session_state.resultado_actual = resultado
+                    
+                    # Limpiar texto de consulta después de procesar
+                    st.session_state.consulta_actual = ""
+                    
+                    # Forzar rerun para actualizar interfaz
+                    st.rerun()
+            else:
+                st.warning("Por favor ingresa una consulta")
+    
+    with col2:
+        if st.button("Limpiar", use_container_width=True):
+            st.session_state.consulta_actual = ""
+            st.session_state.resultado_actual = None
+            st.rerun()
+    
+    # Mostrar resultado si existe
+    if st.session_state.get("resultado_actual"):
+        resultado = st.session_state.resultado_actual
+        
+        st.markdown("---")
+        st.markdown("### Resultado de la consulta")
+        
+        # Mostrar la consulta original del usuario
+        if st.session_state.historial:
+            ultima_consulta = st.session_state.historial[-1]
+            with st.container(border=True):
+                st.markdown(f"**Tu consulta:** {ultima_consulta}")
+        
+        # Mostrar respuesta
+        st.markdown(resultado["texto_visible"])
+        
+        # Mostrar información técnica (solo para administrador_supremo)
+        if st.session_state.rol == "administrador_supremo":
+            with st.expander("Detalles técnicos (solo administrador)", expanded=False):
+                st.json({
+                    "categoria": resultado["categoria"],
+                    "fuente": resultado["fuente"],
+                    "usando_ai": resultado["usando_ai"],
+                    "sigue_protocolo": resultado["sigue_protocolo"],
+                    "timestamp": datetime.now().isoformat()
+                })
+        
+        # Sección de consulta normativa DESPUÉS del resultado
+        st.markdown("---")
+        st.markdown("### Consulta normativa")
+        st.markdown("¿Tienes otra consulta? Utiliza el campo de texto arriba para realizar una nueva consulta.")
+    
+    # Si no hay resultado, mostrar instrucciones
+    else:
+        st.markdown("---")
+        st.markdown("### Instrucciones de uso")
+        st.markdown("""
+        1. Escribe tu consulta en el campo de texto superior
+        2. Haz clic en **Consultar** para procesar tu solicitud
+        3. Revisa el resultado que aparecerá en esta sección
+        4. Para una nueva consulta, escribe en el campo de texto y haz clic en **Consultar** nuevamente
+        
+        **Ejemplos de consultas:**
+        - Requisitos para apertura de negocio
+        - Permisos para construcción
+        - Denuncia por ruido excesivo
+        - Consulta sobre uso de suelo
+        """)
+
+# ============================================================================
+# EJECUCIÓN
+# ============================================================================
+
+if __name__ == "__main__":
+    main()
