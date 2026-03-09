@@ -24,14 +24,12 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* CSS OPTIMIZADO CON CONTRASTE MEJORADO PARA MÓVIL - SISTEMA DE DISEÑO 2026 */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* COLORES INSTITUCIONALES 2026 - CONTRASTE MEJORADO */
-  --color-fondo: #0A1129;           /* Más oscuro para mejor contraste */
-  --color-surface: #1A2339;         /* Superficie más clara vs fondo */
+  /* COLORES INSTITUCIONALES 2026 */
+  --color-fondo: #0F172A;
+  --color-surface: #1E293B;
   --color-primary: #3B82F6;
   --color-primary-hover: #2563EB;
   --color-gobierno: #1D4ED8;
@@ -40,23 +38,17 @@ st.markdown("""
   --color-alerta: #EF4444;
   --color-advertencia: #F59E0B;
   
-  /* ESCALA DE GRISES 2026 - CONTRASTE OPTIMIZADO */
-  --gray-50: #FFFFFF;               /* Blanco puro para máximo contraste */
-  --gray-100: #F8FAFC;              /* Casi blanco */
-  --gray-200: #F1F5F9;              /* Texto principal - alto contraste */
-  --gray-300: #E2E8F0;              /* Texto secundario */
-  --gray-400: #CBD5E1;              /* Texto terciario */
-  --gray-500: #94A3B8;              /* Placeholders, íconos */
-  --gray-600: #64748B;              /* Bordes, separadores */
-  --gray-700: #475569;              /* Superficies oscuras */
-  --gray-800: #334155;              /* Fondo elementos */
-  --gray-900: #1E293B;              /* Fondo principal */
-  
-  /* COLORES DE TEXTO ESPECÍFICOS PARA ALTO CONTRASTE */
-  --text-primary: #FFFFFF;          /* Texto principal - blanco puro */
-  --text-secondary: #E2E8F0;        /* Texto secundario */
-  --text-muted: #94A3B8;            /* Texto menos importante */
-  --text-on-primary: #FFFFFF;       /* Texto sobre botones primarios */
+  /* ESCALA DE GRISES 2026 */
+  --gray-50: #F8FAFC;
+  --gray-100: #F1F5F9;
+  --gray-200: #E2E8F0;
+  --gray-300: #CBD5E1;
+  --gray-400: #94A3B8;
+  --gray-500: #64748B;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1E293B;
+  --gray-900: #0F172A;
   
   /* GRADIENTES */
   --gradient-primary: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
@@ -98,27 +90,11 @@ st.markdown("""
   --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ============================================================================
-   RESET Y BASE - CONTRASTE MEJORADO
-   ============================================================================ */
+/* RESET Y BASE */
 * { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-sans); background: var(--color-fondo); color: var(--gray-200); min-height: 100vh; }
 
-body { 
-  font-family: var(--font-sans); 
-  background: var(--color-fondo); 
-  color: var(--text-primary); /* BLANCO PURO para máximo contraste */
-  min-height: 100vh;
-  line-height: 1.6;
-}
-
-/* Mejorar contraste de todos los textos Streamlit por defecto */
-.stMarkdown, .stText, .stCaption, .stCode {
-  color: var(--text-primary) !important;
-}
-
-/* ============================================================================
-   TÍTULOS CON ALTO CONTRASTE
-   ============================================================================ */
+/* TÍTULOS CON GRADIENTE */
 h1, .stMarkdown h1 { 
   font-size: var(--text-3xl); 
   font-weight: 700; 
@@ -127,34 +103,11 @@ h1, .stMarkdown h1 {
   -webkit-text-fill-color: transparent; 
   background-clip: text; 
   margin-bottom: var(--space-4); 
-  line-height: 1.2;
 }
+h2, .stMarkdown h2 { font-size: var(--text-2xl); color: var(--gray-100); margin-bottom: var(--space-4); }
+h3, .stMarkdown h3 { font-size: var(--text-xl); color: var(--gray-200); margin-bottom: var(--space-4); }
 
-h2, .stMarkdown h2 { 
-  font-size: var(--text-2xl); 
-  color: var(--text-primary) !important; /* BLANCO para alto contraste */
-  margin-bottom: var(--space-4); 
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-h3, .stMarkdown h3 { 
-  font-size: var(--text-xl); 
-  color: var(--text-primary) !important; /* BLANCO para alto contraste */
-  margin-bottom: var(--space-4); 
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-/* Texto normal en Streamlit */
-.stMarkdown p, .stMarkdown li, .stMarkdown div {
-  color: var(--text-primary) !important;
-  line-height: 1.6;
-}
-
-/* ============================================================================
-   BOTONES STREAMLIT - CONTRASTE MEJORADO
-   ============================================================================ */
+/* BOTONES STREAMLIT */
 .stButton > button {
   border-radius: var(--radius-lg) !important;
   border: none !important;
@@ -163,208 +116,109 @@ h3, .stMarkdown h3 {
   font-size: var(--text-sm) !important;
   padding: var(--space-3) var(--space-6) !important;
   transition: all var(--transition-base) !important;
-  min-height: 44px !important; /* Touch target mínimo para móvil */
-  color: var(--text-on-primary) !important; /* Texto blanco en botones */
+  min-height: 44px !important;
 }
-
-/* Botón primario - alto contraste */
 .stButton > button[data-testid="baseButton-primary"] {
   background: var(--gradient-primary) !important;
-  color: var(--text-on-primary) !important; /* Blanco garantizado */
-  font-weight: 700 !important;
+  color: white !important;
 }
-
 .stButton > button[data-testid="baseButton-primary"]:hover {
   transform: translateY(-2px) !important;
   box-shadow: var(--shadow-primary) !important;
-  filter: brightness(1.1) !important; /* Efecto hover visible */
 }
-
-/* Botón secundario - mejor contraste */
 .stButton > button[data-testid="baseButton-secondary"] {
   background: var(--color-surface) !important;
-  color: var(--text-primary) !important; /* Blanco para contraste */
-  border: 2px solid var(--gray-600) !important; /* Borde más visible */
-  font-weight: 600 !important;
+  color: var(--gray-300) !important;
+  border: 1px solid var(--gray-700) !important;
 }
-
 .stButton > button[data-testid="baseButton-secondary"]:hover {
   background: var(--gray-800) !important;
-  border-color: var(--color-primary) !important; /* Borde azul en hover */
+  border-color: var(--gray-600) !important;
   transform: translateY(-2px) !important;
-  color: var(--text-primary) !important;
 }
 
-/* ============================================================================
-   INPUTS STREAMLIT - CONTRASTE MEJORADO
-   ============================================================================ */
+/* INPUTS STREAMLIT */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea {
   background: var(--color-surface) !important;
-  border: 2px solid var(--gray-600) !important; /* Borde más visible */
+  border: 2px solid var(--gray-700) !important;
   border-radius: var(--radius-lg) !important;
-  color: var(--text-primary) !important; /* Texto blanco */
+  color: var(--gray-200) !important;
   padding: var(--space-3) var(--space-4) !important;
   font-family: var(--font-sans) !important;
   font-size: var(--text-base) !important;
   transition: all var(--transition-base) !important;
 }
-
-/* Placeholders con mejor contraste */
-.stTextInput > div > div > input::placeholder,
-.stTextArea > div > div > textarea::placeholder {
-  color: var(--text-muted) !important; /* Gris visible pero diferenciado */
-  opacity: 0.8 !important;
-}
-
 .stTextInput > div > div > input:focus,
 .stTextArea > div > div > textarea:focus {
   border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important; /* Sombra más visible */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
   outline: none !important;
-  background: var(--gray-900) !important; /* Fondo más oscuro en focus */
 }
 
-/* ============================================================================
-   CONTAINERS Y CARDS - CONTRASTE MEJORADO
-   ============================================================================ */
+/* CONTAINERS Y CARDS */
 .stContainer, .stExpander, div[data-testid="stVerticalBlock"] > div {
-  background: rgba(26, 35, 57, 0.9) !important; /* Más opaco para mejor contraste */
+  background: rgba(30, 41, 59, 0.7) !important;
   backdrop-filter: blur(10px);
   border-radius: var(--radius-xl) !important;
-  border: 1px solid var(--gray-700) !important; /* Borde más visible */
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   padding: var(--space-6) !important;
   margin-bottom: var(--space-4) !important;
   transition: all var(--transition-base) !important;
 }
-
 .stContainer:hover, .stExpander:hover {
-  border-color: var(--color-primary) !important; /* Borde azul en hover */
+  border-color: rgba(59, 130, 246, 0.3) !important;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg) !important;
 }
 
-/* Texto dentro de containers */
-.stContainer .stMarkdown,
-.stExpander .stMarkdown,
-div[data-testid="stVerticalBlock"] > div .stMarkdown {
-  color: var(--text-primary) !important;
-}
-
-/* ============================================================================
-   SIDEBAR - CONTRASTE MEJORADO
-   ============================================================================ */
+/* SIDEBAR */
 section[data-testid="stSidebar"] {
   background: var(--color-fondo) !important;
-  border-right: 2px solid var(--gray-800) !important; /* Borde más grueso */
+  border-right: 1px solid var(--gray-800) !important;
 }
-
 section[data-testid="stSidebar"] > div {
   padding: var(--space-6) !important;
 }
 
-/* Texto en sidebar */
-section[data-testid="stSidebar"] .stMarkdown,
-section[data-testid="stSidebar"] .stText {
-  color: var(--text-primary) !important;
-}
+/* ALERTAS */
+.stAlert { border-radius: var(--radius-lg) !important; padding: var(--space-4) !important; }
+div[data-testid="stAlert"] > div { border-radius: var(--radius-lg) !important; }
 
-/* ============================================================================
-   ALERTAS - CONTRASTE MEJORADO
-   ============================================================================ */
-.stAlert { 
-  border-radius: var(--radius-lg) !important; 
-  padding: var(--space-4) !important; 
-  border: 2px solid transparent !important; /* Borde para destacar */
-}
-
-div[data-testid="stAlert"] > div { 
-  border-radius: var(--radius-lg) !important; 
-  color: var(--text-primary) !important; /* Texto blanco en alertas */
-}
-
-/* ============================================================================
-   RESPONSIVE - OPTIMIZACIONES ESPECÍFICAS PARA MÓVIL
-   ============================================================================ */
+/* RESPONSIVE */
 @media (max-width: 768px) {
-  /* Aumentar contraste y tamaño en móvil */
-  body {
-    font-size: var(--text-base) !important;
-    line-height: 1.7 !important; /* Más espacio entre líneas */
+  .stContainer, .stExpander { padding: var(--space-4) !important; border-radius: var(--radius-lg) !important; }
+  .stButton > button { padding: var(--space-4) var(--space-6) !important; width: 100% !important; }
+  section[data-testid="stSidebar"] { width: 100% !important; max-width: 100% !important; }
+  h1, .stMarkdown h1 { font-size: var(--text-2xl) !important; }
+  h2, .stMarkdown h2 { font-size: var(--text-xl) !important; }
+  h3, .stMarkdown h3 { font-size: var(--text-lg) !important; }
+}
+
+/* DARK/LIGHT MODE */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-fondo: #FFFFFF;
+    --color-surface: #F8FAFC;
+    --gray-200: #1E293B;
+    --gray-300: #334155;
+    --gray-700: #94A3B8;
+    --gray-800: #64748B;
+    --gray-900: #475569;
   }
-  
-  .stContainer, .stExpander { 
-    padding: var(--space-4) !important; 
-    border-radius: var(--radius-lg) !important;
-    background: rgba(26, 35, 57, 0.95) !important; /* Más opaco en móvil */
-  }
-  
-  .stButton > button { 
-    padding: var(--space-4) var(--space-6) !important; 
-    width: 100% !important;
-    min-height: 48px !important; /* Touch target más grande en móvil */
-    font-size: var(--text-base) !important; /* Texto más grande */
-  }
-  
-  section[data-testid="stSidebar"] { 
-    width: 100% !important; 
-    max-width: 100% !important;
-    border-right: none !important;
-    border-bottom: 2px solid var(--gray-800) !important;
-  }
-  
-  /* Títulos más grandes y con mejor contraste en móvil */
-  h1, .stMarkdown h1 { 
-    font-size: var(--text-2xl) !important; 
-    font-weight: 800 !important; /* Más negrita */
-  }
-  
-  h2, .stMarkdown h2 { 
-    font-size: var(--text-xl) !important; 
-    font-weight: 700 !important;
-    color: var(--text-primary) !important;
-  }
-  
-  h3, .stMarkdown h3 { 
-    font-size: var(--text-lg) !important; 
-    font-weight: 600 !important;
-    color: var(--text-primary) !important;
-  }
-  
-  /* Inputs más grandes en móvil */
-  .stTextInput > div > div > input,
-  .stTextArea > div > div > textarea {
-    padding: var(--space-4) !important;
-    font-size: var(--text-base) !important;
-    min-height: 48px !important; /* Más alto para fácil tapping */
-  }
-  
-  /* Mejorar contraste de texto en móvil con brillo bajo */
-  .stMarkdown p, .stMarkdown li {
-    font-weight: 400 !important; /* Peso normal para mejor legibilidad */
-    color: var(--text-primary) !important;
+  .stContainer, .stExpander {
+    background: rgba(248, 250, 252, 0.9) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
   }
 }
 
-/* ============================================================================
-   CONTRASTE EXTREMO PARA CONDICIONES DE LUZ DIFÍCILES
-   ============================================================================ */
-@media (max-width: 768px) and (prefers-color-scheme: dark) {
-  /* Modo alto contraste para móvil en modo oscuro */
-  :root {
-    --text-primary: #FFFFFF !important;
-    --color-fondo: #000000 !important; /* Negro puro para máximo contraste */
-    --color-surface: #111827 !important;
+/* REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-  
-  body {
-    background: #000000 !important;
-    color: #FFFFFF !important;
-  }
-  
-  .stContainer, .stExpander {
-    background: #111827 !important;
-    border: 2px solid #334155 !important; /* Bordes muy vis
+}
 </style>
 """, unsafe_allow_html=True)
 
