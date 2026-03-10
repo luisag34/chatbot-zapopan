@@ -529,10 +529,10 @@ def main():
         st.markdown("*Escribe tu consulta arriba y haz clic en **Consultar***")
 
 # ============================================================================
-# IMPORTS SISTEMA LOCAL EXPANDIDO
+# IMPORTS SISTEMA LOCAL SIMPLE (EVITA ERRORES STREAMLIT CLOUD)
 # ============================================================================
 
-from procesador_expandido import procesar_consulta_local_expandida
+from procesador_simple import procesar_consulta_local_expandida
 
 # ============================================================================
 # EJECUCIÓN
