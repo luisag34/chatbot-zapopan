@@ -18,13 +18,19 @@ st.set_page_config(
 )
 
 # ============================================================================
-# SISTEMA DE DISEÑO RESONANT STARK 2026 (COMPACTO)
+# SISTEMA DE DISEÑO RESONANT STARK 2026 (CSS EXTERNO VÍA CDN)
 # ============================================================================
 
+# CSS externo via GitHub Raw - Streamlit Cloud funciona mejor con esto
 st.markdown("""
+<link rel="stylesheet" href="https://raw.githubusercontent.com/luisag34/chatbot-zapopan/main/estilos_resonant_stark.css">
 <style>
-/* CSS RESONANT STARK - DISEÑO 2026 COMPACTO Y PROFESIONAL */
-:root {
+/* CSS mínimo de respaldo por si CDN falla */
+.stApp { background: #FFFFFF !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; }
+.stButton > button { background: #1D4ED8 !important; color: white !important; border-radius: 8px !important; }
+.stTextInput > div > div > input { border: 1px solid #E5E7EB !important; border-radius: 8px !important; }
+</style>
+""", unsafe_allow_html=True)
   /* PALETA RESONANT STARK */
   --rs-background: #FFFFFF;
   --rs-surface: #F8FAFC;
