@@ -201,14 +201,70 @@ section[data-testid="stSidebar"] > div {
 .stAlert { border-radius: var(--radius-lg) !important; padding: var(--space-4) !important; }
 div[data-testid="stAlert"] > div { border-radius: var(--radius-lg) !important; }
 
-/* RESPONSIVE */
+/* RESPONSIVE - SIDEBAR VISIBLE EN MÓVIL */
 @media (max-width: 768px) {
   .stContainer, .stExpander { padding: var(--space-4) !important; border-radius: var(--radius-lg) !important; }
   .stButton > button { padding: var(--space-4) var(--space-6) !important; width: 100% !important; }
-  section[data-testid="stSidebar"] { width: 100% !important; max-width: 100% !important; }
+  
+  /* SIDEBAR SIEMPRE VISIBLE EN MÓVIL - CRÍTICO */
+  section[data-testid="stSidebar"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    transform: none !important;
+    z-index: 1000 !important;
+    background: #FFFFFF !important;
+    border-right: none !important;
+    padding: var(--space-4) !important;
+  }
+  
+  /* CONTENIDO SIDEBAR VISIBLE */
+  section[data-testid="stSidebar"] > div {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    padding: var(--space-4) !important;
+  }
+  
+  /* BOTÓN TOGGLE SIEMPRE VISIBLE Y ACCESIBLE */
+  button[data-testid="baseButton-header"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    z-index: 1001 !important;
+    background: var(--color-primary) !important;
+    color: white !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    font-size: 20px !important;
+    line-height: 40px !important;
+    text-align: center !important;
+  }
+  
+  /* TIPOGRAFÍA MÓVIL */
   h1, .stMarkdown h1 { font-size: var(--text-2xl) !important; }
   h2, .stMarkdown h2 { font-size: var(--text-xl) !important; }
   h3, .stMarkdown h3 { font-size: var(--text-lg) !important; }
+  
+  /* MENSAJE DE AYUDA PARA SIDEBAR */
+  .sidebar-mobile-help {
+    display: block !important;
+    background: var(--color-primary) !important;
+    color: white !important;
+    padding: var(--space-2) var(--space-3) !important;
+    border-radius: var(--radius-md) !important;
+    margin-bottom: var(--space-4) !important;
+    font-size: var(--text-sm) !important;
+    text-align: center !important;
+  }
 }
 
 /* DARK/LIGHT MODE */
@@ -344,8 +400,11 @@ def main():
     # PANTALLA PRINCIPAL (AUTENTICADO)
     # ========================================================================
     
-    # Sidebar - Columna desplegable izquierda
+    # Sidebar - Columna desplegable izquierda (SIEMPRE VISIBLE EN MÓVIL)
     with st.sidebar:
+        # Mensaje de ayuda solo en móvil
+        st.markdown('<div class="sidebar-mobile-help">📱 Barra lateral - Navegación y sesión</div>', unsafe_allow_html=True)
+        
         st.markdown(f"### {st.session_state.nombre}")
         st.markdown(f"**Rol:** {st.session_state.rol.replace('_', ' ').title()}")
         st.markdown(f"**Sistema:** Local - Protocolo específico")
