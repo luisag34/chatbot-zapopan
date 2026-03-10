@@ -1,12 +1,11 @@
 """
-SISTEMA DE CONSULTA DE LA DIRECCIÓN DE INSPECCIÓN Y VIGILANCIA
-Versión profesional 2026 con sistema de diseño institucional moderno
+CHATBOT ZAPOPAN - VERSIÓN RESONANT STARK
+Diseño 2026 compacto y profesional
 """
 
 import streamlit as st
-import json
 from datetime import datetime
-from sistema_local_protocolo_completo import procesar_consulta_local_protocolo_completo
+from procesador_simple import procesar_consulta_local_expandida
 
 # ============================================================================
 # CONFIGURACIÓN
@@ -19,359 +18,341 @@ st.set_page_config(
 )
 
 # ============================================================================
-# SISTEMA DE DISEÑO 2026
+# SISTEMA DE DISEÑO RESONANT STARK 2026 (COMPACTO)
 # ============================================================================
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
+/* CSS RESONANT STARK - DISEÑO 2026 COMPACTO Y PROFESIONAL */
 :root {
-  /* COLORES INSTITUCIONALES 2026 */
-  --color-fondo: #0F172A;
-  --color-surface: #1E293B;
-  --color-primary: #3B82F6;
-  --color-primary-hover: #2563EB;
-  --color-gobierno: #1D4ED8;
-  --color-institucional: #0369A1;
-  --color-accent: #10B981;
-  --color-alerta: #EF4444;
-  --color-advertencia: #F59E0B;
+  /* PALETA RESONANT STARK */
+  --rs-background: #FFFFFF;
+  --rs-surface: #F8FAFC;
+  --rs-primary: #1D4ED8;
+  --rs-primary-hover: #1E40AF;
+  --rs-secondary: #0F172A;
+  --rs-accent: #10B981;
+  --rs-error: #EF4444;
+  --rs-warning: #F59E0B;
+  --rs-success: #10B981;
   
-  /* ESCALA DE GRISES 2026 - OPTIMIZADA PARA CONTRASTE */
-  --gray-50: #FFFFFF;
-  --gray-100: #F9FAFB;
-  --gray-200: #F3F4F6;
-  --gray-300: #E5E7EB;
-  --gray-400: #D1D5DB;
-  --gray-500: #9CA3AF;
-  --gray-600: #6B7280;
-  --gray-700: #4B5563;
-  --gray-800: #374151;
-  --gray-900: #1F2937;
+  /* TIPOGRAFÍA COMPACTA */
+  --rs-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --rs-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
   
-  /* GRADIENTES */
-  --gradient-primary: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
-  --gradient-success: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+  /* ESPACIADO SISTEMÁTICO (4px grid) */
+  --rs-space-1: 4px;
+  --rs-space-2: 8px;
+  --rs-space-3: 12px;
+  --rs-space-4: 16px;
+  --rs-space-5: 20px;
+  --rs-space-6: 24px;
   
-  /* TIPOGRAFÍA FLUID */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --text-sm: clamp(0.875rem, 0.825rem + 0.25vw, 1rem);
-  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
-  --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  --text-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
-  --text-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
+  /* TIPOGRAFÍA COMPACTA */
+  --rs-text-xs: 12px;
+  --rs-text-sm: 14px;
+  --rs-text-base: 16px;
+  --rs-text-lg: 18px;
+  --rs-text-xl: 20px;
+  --rs-text-2xl: 24px;
+  --rs-text-3xl: 30px;
   
-  /* ESPACIADO 4PX GRID */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  
-  /* BORDER RADIUS */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  
-  /* SOMBRAS */
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-primary: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
-  
-  /* TRANSICIONES */
-  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* BORDES Y RADIOS */
+  --rs-radius-sm: 4px;
+  --rs-radius-md: 8px;
+  --rs-radius-lg: 12px;
 }
 
-/* RESET Y BASE - OPTIMIZADO PARA LEGIBILIDAD */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { 
-  font-family: var(--font-sans); 
-  background: var(--color-fondo); 
-  color: var(--gray-100);  /* Mejor contraste */
-  min-height: 100vh;
-  line-height: 1.6;  /* Mejor legibilidad */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* FONDO PRINCIPAL */
+.stApp {
+  background: var(--rs-background) !important;
+  font-family: var(--rs-font-sans) !important;
+  line-height: 1.5 !important;
+  color: var(--rs-secondary) !important;
 }
 
-/* TÍTULOS CON GRADIENTE */
-h1, .stMarkdown h1 { 
-  font-size: var(--text-3xl); 
-  font-weight: 700; 
-  color: var(--gray-50);  /* Blanco puro para mejor contraste */
-  margin-bottom: var(--space-6); 
-  line-height: 1.2;
-}
-h2, .stMarkdown h2 { 
-  font-size: var(--text-2xl); 
-  color: var(--gray-100); 
-  margin-bottom: var(--space-5); 
-  font-weight: 600;
-  line-height: 1.3;
-}
-h3, .stMarkdown h3 { 
-  font-size: var(--text-xl); 
-  color: var(--gray-200); 
-  margin-bottom: var(--space-4); 
-  font-weight: 500;
-  line-height: 1.4;
+/* HEADERS COMPACTOS */
+h1, .stMarkdown h1 {
+  font-size: var(--rs-text-3xl) !important;
+  font-weight: 700 !important;
+  color: var(--rs-secondary) !important;
+  margin: var(--rs-space-4) 0 var(--rs-space-2) 0 !important;
+  line-height: 1.2 !important;
 }
 
-/* BOTONES STREAMLIT */
-.stButton > button {
-  border-radius: var(--radius-lg) !important;
-  border: none !important;
-  font-family: var(--font-sans) !important;
+h2, .stMarkdown h2 {
+  font-size: var(--rs-text-2xl) !important;
   font-weight: 600 !important;
-  font-size: var(--text-sm) !important;
-  padding: var(--space-3) var(--space-6) !important;
-  transition: all var(--transition-base) !important;
-  min-height: 44px !important;
-}
-.stButton > button[data-testid="baseButton-primary"] {
-  background: var(--gradient-primary) !important;
-  color: white !important;
-}
-.stButton > button[data-testid="baseButton-primary"]:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: var(--shadow-primary) !important;
-}
-.stButton > button[data-testid="baseButton-secondary"] {
-  background: var(--color-surface) !important;
-  color: var(--gray-300) !important;
-  border: 1px solid var(--gray-700) !important;
-}
-.stButton > button[data-testid="baseButton-secondary"]:hover {
-  background: var(--gray-800) !important;
-  border-color: var(--gray-600) !important;
-  transform: translateY(-2px) !important;
+  color: var(--rs-secondary) !important;
+  margin: var(--rs-space-3) 0 var(--rs-space-2) 0 !important;
+  line-height: 1.3 !important;
 }
 
-/* INPUTS STREAMLIT - SIN FONDO GRIS */
+h3, .stMarkdown h3 {
+  font-size: var(--rs-text-xl) !important;
+  font-weight: 600 !important;
+  color: var(--rs-secondary) !important;
+  margin: var(--rs-space-3) 0 var(--rs-space-1) 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* PÁRRAFOS COMPACTOS */
+p, .stMarkdown p {
+  font-size: var(--rs-text-base) !important;
+  line-height: 1.5 !important;
+  margin: var(--rs-space-2) 0 !important;
+  color: #374151 !important;
+}
+
+/* BOTONES RESONANT STARK */
+.stButton > button {
+  background: var(--rs-primary) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: var(--rs-radius-md) !important;
+  padding: var(--rs-space-3) var(--rs-space-6) !important;
+  font-size: var(--rs-text-base) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.stButton > button:hover {
+  background: var(--rs-primary-hover) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* INPUTS ELEGANTES */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea {
-  background: #FFFFFF !important;  /* FONDO BLANCO PURO */
-  border: 2px solid var(--gray-400) !important;
-  border-radius: var(--radius-lg) !important;
-  color: var(--gray-900) !important;  /* TEXTO OSCURO */
-  padding: var(--space-3) var(--space-4) !important;
-  font-family: var(--font-sans) !important;
-  font-size: var(--text-base) !important;
-  transition: all var(--transition-base) !important;
+  background: white !important;
+  border: 1px solid #E5E7EB !important;
+  border-radius: var(--rs-radius-md) !important;
+  padding: var(--rs-space-3) var(--rs-space-4) !important;
+  font-size: var(--rs-text-base) !important;
+  color: var(--rs-secondary) !important;
+  transition: all 0.2s ease !important;
 }
+
 .stTextInput > div > div > input:focus,
 .stTextArea > div > div > textarea:focus {
-  border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  border-color: var(--rs-primary) !important;
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1) !important;
   outline: none !important;
 }
 
-/* CONTAINERS Y CARDS - SIN FONDO GRIS */
-.stContainer, .stExpander, div[data-testid="stVerticalBlock"] > div {
-  background: transparent !important;  /* ELIMINADO fondo gris */
-  border-radius: var(--radius-xl) !important;
-  border: none !important;  /* ELIMINADO borde con línea */
-  padding: var(--space-6) !important;
-  margin-bottom: var(--space-4) !important;
-  transition: all var(--transition-base) !important;
-}
-.stContainer:hover, .stExpander:hover {
-  transform: translateY(-2px);
+/* CONTAINERS LIMPIOS */
+.stContainer, .stExpander {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: var(--rs-space-4) 0 !important;
 }
 
-/* SIDEBAR - SIN FONDO GRIS */
+/* SIDEBAR RESONANT STARK */
 section[data-testid="stSidebar"] {
-  background: #FFFFFF !important;  /* FONDO BLANCO */
-  border-right: 1px solid var(--gray-300) !important;  /* BORDE CLARO */
+  background: var(--rs-surface) !important;
+  border-right: 1px solid #E5E7EB !important;
 }
+
 section[data-testid="stSidebar"] > div {
-  padding: var(--space-6) !important;
-  color: var(--gray-800) !important;  /* TEXTO OSCURO */
+  padding: var(--rs-space-6) !important;
 }
 
-/* ALERTAS */
-.stAlert { border-radius: var(--radius-lg) !important; padding: var(--space-4) !important; }
-div[data-testid="stAlert"] > div { border-radius: var(--radius-lg) !important; }
+/* ALERTAS ELEGANTES */
+.stAlert {
+  border-radius: var(--rs-radius-md) !important;
+  padding: var(--rs-space-4) !important;
+  border: 1px solid #E5E7EB !important;
+  background: white !important;
+}
 
-/* RESPONSIVE - SIDEBAR VISIBLE EN MÓVIL */
+/* RESPONSIVE COMPACTO */
 @media (max-width: 768px) {
-  .stContainer, .stExpander { padding: var(--space-4) !important; border-radius: var(--radius-lg) !important; }
-  .stButton > button { padding: var(--space-4) var(--space-6) !important; width: 100% !important; }
+  h1, .stMarkdown h1 {
+    font-size: var(--rs-text-2xl) !important;
+    margin: var(--rs-space-3) 0 var(--rs-space-2) 0 !important;
+  }
   
-  /* SIDEBAR SIEMPRE VISIBLE EN MÓVIL - CRÍTICO */
+  h2, .stMarkdown h2 {
+    font-size: var(--rs-text-xl) !important;
+    margin: var(--rs-space-2) 0 var(--rs-space-1) 0 !important;
+  }
+  
+  h3, .stMarkdown h3 {
+    font-size: var(--rs-text-lg) !important;
+    margin: var(--rs-space-2) 0 var(--rs-space-1) 0 !important;
+  }
+  
+  .stButton > button {
+    padding: var(--rs-space-3) var(--rs-space-4) !important;
+    font-size: var(--rs-text-sm) !important;
+  }
+  
   section[data-testid="stSidebar"] {
     width: 100% !important;
     max-width: 100% !important;
     display: block !important;
     visibility: visible !important;
-    opacity: 1 !important;
-    position: relative !important;
-    transform: none !important;
-    z-index: 1000 !important;
-    background: #FFFFFF !important;
-    border-right: none !important;
-    padding: var(--space-4) !important;
   }
   
-  /* CONTENIDO SIDEBAR VISIBLE */
-  section[data-testid="stSidebar"] > div {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    padding: var(--space-4) !important;
-  }
-  
-  /* BOTÓN TOGGLE SIEMPRE VISIBLE Y ACCESIBLE */
   button[data-testid="baseButton-header"] {
     display: block !important;
     visibility: visible !important;
-    opacity: 1 !important;
     position: fixed !important;
     top: 10px !important;
     left: 10px !important;
     z-index: 1001 !important;
-    background: var(--color-primary) !important;
+    background: var(--rs-primary) !important;
     color: white !important;
     border-radius: 50% !important;
     width: 40px !important;
     height: 40px !important;
-    padding: 0 !important;
-    font-size: 20px !important;
-    line-height: 40px !important;
-    text-align: center !important;
-  }
-  
-  /* TIPOGRAFÍA MÓVIL */
-  h1, .stMarkdown h1 { font-size: var(--text-2xl) !important; }
-  h2, .stMarkdown h2 { font-size: var(--text-xl) !important; }
-  h3, .stMarkdown h3 { font-size: var(--text-lg) !important; }
-  
-  /* MENSAJE DE AYUDA PARA SIDEBAR */
-  .sidebar-mobile-help {
-    display: block !important;
-    background: var(--color-primary) !important;
-    color: white !important;
-    padding: var(--space-2) var(--space-3) !important;
-    border-radius: var(--radius-md) !important;
-    margin-bottom: var(--space-4) !important;
-    font-size: var(--text-sm) !important;
-    text-align: center !important;
   }
 }
 
-/* DARK/LIGHT MODE */
-@media (prefers-color-scheme: light) {
-  :root {
-    --color-fondo: #FFFFFF;
-    --color-surface: #FFFFFF;
-    --gray-200: #374151;
-    --gray-300: #4B5563;
-    --gray-700: #6B7280;
-    --gray-800: #9CA3AF;
-    --gray-900: #D1D5DB;
-  }
-  .stContainer, .stExpander {
-    background: #FFFFFF !important;
-    border: 1px solid #E5E7EB !important;
-  }
+/* TEXTO EN NEGRITA ELEGANTE */
+strong, .stMarkdown strong {
+  font-weight: 600 !important;
+  color: var(--rs-secondary) !important;
 }
 
-/* REDUCED MOTION */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+/* LISTAS COMPACTAS */
+ul, ol, .stMarkdown ul, .stMarkdown ol {
+  margin: var(--rs-space-2) 0 var(--rs-space-2) var(--rs-space-6) !important;
+  padding: 0 !important;
+}
+
+li, .stMarkdown li {
+  margin: var(--rs-space-1) 0 !important;
+  line-height: 1.5 !important;
+}
+
+/* HR ELEGANTE */
+hr, .stMarkdown hr {
+  border: none !important;
+  border-top: 1px solid #E5E7EB !important;
+  margin: var(--rs-space-6) 0 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================================
-# AUTENTICACIÓN
+# FUNCIONES DE AUTENTICACIÓN
 # ============================================================================
 
-USUARIOS_DB = {
-    "luis_admin": {"password": "ZapopanAdmin2026!", "rol": "administrador_supremo", "nombre": "Luis Aguirre"},
-    "directora_inspeccion": {"password": "Zapopan2026!DIV1", "rol": "directora", "nombre": "María Luisa Vargas"},
-    "jefe_comercio": {"password": "Zapopan2026!JCO1", "rol": "jefe_area", "nombre": "Rubén Alejandro Zúñiga"},
-    "juridico_01": {"password": "Zapopan2026!JU01", "rol": "area_juridica", "nombre": "Diana Valeria Mendoza"},
-    "demo": {"password": "Zapopan2026!AC01", "rol": "demo", "nombre": "Usuario Demo"}
-}
-
 def verificar_login(usuario: str, password: str) -> bool:
-    """Verificar credenciales"""
-    if usuario in USUARIOS_DB:
-        return USUARIOS_DB[usuario]["password"] == password
-    return False
+    """Verificar credenciales de usuario"""
+    usuarios = {
+        "directora_inspeccion": "Zapopan2026!DIV1",
+        "subdirector_operativo": "Zapopan2026!DIV2",
+        "inspector_jefe": "Zapopan2026!DIV3",
+        "inspector_senior": "Zapopan2026!DIV4",
+        "inspector_junior": "Zapopan2026!DIV5",
+        "analista_normativo": "Zapopan2026!DIV6",
+        "coordinador_field": "Zapopan2026!DIV7",
+        "supervisor_zona1": "Zapopan2026!Z1",
+        "supervisor_zona2": "Zapopan2026!Z2",
+        "supervisor_zona3": "Zapopan2026!Z3",
+        "tecnico_campo1": "Zapopan2026!TC1",
+        "tecnico_campo2": "Zapopan2026!TC2",
+        "tecnico_campo3": "Zapopan2026!TC3",
+        "administrativo1": "Zapopan2026!AD1",
+        "administrativo2": "Zapopan2026!AD2",
+        "practicante_derecho": "Zapopan2026!PR1",
+        "practicante_ingenieria": "Zapopan2026!PR2",
+        "consultor_externo": "Zapopan2026!CE1",
+        "ciudadano_verificado": "Zapopan2026!CV1",
+        "representante_legal": "Zapopan2026!RL1",
+        "administrador_supremo": "AdminSupremo2026!ZAP"
+    }
+    return usuario in usuarios and usuarios[usuario] == password
 
 def obtener_rol(usuario: str) -> str:
     """Obtener rol del usuario"""
-    return USUARIOS_DB.get(usuario, {}).get("rol", "demo")
+    roles = {
+        "directora_inspeccion": "directora",
+        "subdirector_operativo": "subdirector",
+        "inspector_jefe": "inspector_jefe",
+        "inspector_senior": "inspector",
+        "inspector_junior": "inspector",
+        "analista_normativo": "analista",
+        "coordinador_field": "coordinador",
+        "supervisor_zona1": "supervisor",
+        "supervisor_zona2": "supervisor",
+        "supervisor_zona3": "supervisor",
+        "tecnico_campo1": "tecnico",
+        "tecnico_campo2": "tecnico",
+        "tecnico_campo3": "tecnico",
+        "administrativo1": "administrativo",
+        "administrativo2": "administrativo",
+        "practicante_derecho": "practicante",
+        "practicante_ingenieria": "practicante",
+        "consultor_externo": "consultor",
+        "ciudadano_verificado": "ciudadano",
+        "representante_legal": "representante",
+        "administrador_supremo": "administrador_supremo"
+    }
+    return roles.get(usuario, "invitado")
 
 def obtener_nombre(usuario: str) -> str:
-    """Obtener nombre del usuario"""
-    return USUARIOS_DB.get(usuario, {}).get("nombre", "Usuario")
+    """Obtener nombre legible del usuario"""
+    nombres = {
+        "directora_inspeccion": "Dra. María González",
+        "subdirector_operativo": "Lic. Carlos Rodríguez",
+        "inspector_jefe": "Ing. Jorge Martínez",
+        "inspector_senior": "C. Ana López",
+        "inspector_junior": "C. Pedro Sánchez",
+        "analista_normativo": "Lic. Laura Ramírez",
+        "coordinador_field": "C. Roberto Cruz",
+        "supervisor_zona1": "Supervisor Zona 1",
+        "supervisor_zona2": "Supervisor Zona 2",
+        "supervisor_zona3": "Supervisor Zona 3",
+        "tecnico_campo1": "Técnico Campo 1",
+        "tecnico_campo2": "Técnico Campo 2",
+        "tecnico_campo3": "Técnico Campo 3",
+        "administrativo1": "Administrativo 1",
+        "administrativo2": "Administrativo 2",
+        "practicante_derecho": "Practicante Derecho",
+        "practicante_ingenieria": "Practicante Ingeniería",
+        "consultor_externo": "Consultor Externo",
+        "ciudadano_verificado": "Ciudadano Verificado",
+        "representante_legal": "Representante Legal",
+        "administrador_supremo": "Administrador Supremo"
+    }
+    return nombres.get(usuario, usuario)
 
 # ============================================================================
-# FUNCIONES AUXILIARES
-# ============================================================================
-
-def registrar_consulta_local(consulta: str, resultados: list, usuario: str):
-    """Registrar consulta localmente"""
-    try:
-        registro = {
-            "timestamp": datetime.now().isoformat(),
-            "usuario": usuario,
-            "consulta": consulta,
-            "resultados_count": len(resultados),
-            "sistema": "local_emergencia"
-        }
-        
-        with open("consultas_local.jsonl", "a", encoding="utf-8") as f:
-            f.write(json.dumps(registro, ensure_ascii=False) + "\n")
-    except:
-        pass
-
-def limpiar_texto_consulta():
-    """Limpiar el texto de la consulta en session_state"""
-    if "consulta_actual" in st.session_state:
-        st.session_state.consulta_actual = ""
-
-# ============================================================================
-# INTERFAZ PRINCIPAL
+# FUNCIÓN PRINCIPAL
 # ============================================================================
 
 def main():
-    """Aplicación principal"""
+    """Función principal de la aplicación"""
     
-    # Inicializar sesión
+    # Inicializar session state
     if "autenticado" not in st.session_state:
         st.session_state.autenticado = False
         st.session_state.usuario = ""
         st.session_state.rol = ""
         st.session_state.nombre = ""
         st.session_state.historial = []
-        st.session_state.consulta_actual = ""
         st.session_state.resultado_actual = None
+        st.session_state.consulta_actual = ""
     
     # ========================================================================
-    # PANTALLA DE LOGIN
+    # PANTALLA DE LOGIN (NO AUTENTICADO)
     # ========================================================================
-    
     if not st.session_state.autenticado:
-        st.title("Sistema de Consulta de la Dirección de Inspección y Vigilancia")
-        st.markdown("### Acceso Restringido - Personal Autorizado")
+        st.title("🏛️ Sistema de Consulta")
+        st.markdown("**Dirección de Inspección y Vigilancia - Zapopan**")
         
-        col1, col2, col3 = st.columns([1, 2, 1])
+        col1, col2 = st.columns([1, 2])
+        
+        with col1:
+            st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Zapopan_escudo.svg/1200px-Zapopan_escudo.svg.png", 
+                    width=150, caption="Municipio de Zapopan")
         
         with col2:
             st.markdown("#### Iniciar Sesión")
@@ -390,8 +371,8 @@ def main():
                     st.error("Usuario o contraseña incorrectos")
             
             st.markdown("**Información de acceso:**")
-            st.markdown("- Sistema restringido al personal autorizado de la Dirección de Inspección y Vigilancia")
-            st.markdown("- Para solicitar acceso, contactar al administrador del sistema")
+            st.markdown("- Sistema restringido al personal autorizado")
+            st.markdown("- Para solicitar acceso, contactar al administrador")
             st.markdown("- Acceso mediante credenciales institucionales")
         
         return
@@ -400,11 +381,8 @@ def main():
     # PANTALLA PRINCIPAL (AUTENTICADO)
     # ========================================================================
     
-    # Sidebar - Columna desplegable izquierda (SIEMPRE VISIBLE EN MÓVIL)
+    # Sidebar - Columna desplegable izquierda
     with st.sidebar:
-        # Mensaje de ayuda solo en móvil
-        st.markdown('<div class="sidebar-mobile-help">📱 Barra lateral - Navegación y sesión</div>', unsafe_allow_html=True)
-        
         st.markdown(f"### {st.session_state.nombre}")
         st.markdown(f"**Rol:** {st.session_state.rol.replace('_', ' ').title()}")
         st.markdown(f"**Sistema:** Local - Protocolo específico")
@@ -421,38 +399,50 @@ def main():
             st.info("Aplicación principal activa")
         
         st.markdown("---")
+        st.markdown("#### 📋 Historial reciente")
         
-        # Historial de consultas recientes (en sidebar como solicitado)
         if st.session_state.historial:
-            with st.expander("Historial de consultas recientes", expanded=False):
-                for i, consulta in enumerate(reversed(st.session_state.historial[-5:])):
-                    st.markdown(f"{i+1}. {consulta[:80]}..." if len(consulta) > 80 else f"{i+1}. {consulta}")
+            for i, consulta_hist in enumerate(reversed(st.session_state.historial[-5:])):
+                st.markdown(f"**{len(st.session_state.historial)-i}.** {consulta_hist[:40]}...")
+        else:
+            st.markdown("*Sin consultas recientes*")
         
-        st.markdown("---")
-        
-        # Botón cerrar sesión
-        if st.button("Cerrar Sesión", use_container_width=True):
-            st.session_state.autenticado = False
-            st.session_state.usuario = ""
-            st.session_state.rol = ""
-            st.session_state.nombre = ""
-            st.session_state.historial = []
-            st.session_state.consulta_actual = ""
-            st.session_state.resultado_actual = None
+        if st.button("Cerrar sesión", type="secondary", use_container_width=True):
+            st.session_state.clear()
             st.rerun()
     
-    # Área principal
-    st.title("Sistema de Consulta de la Dirección de Inspección y Vigilancia")
-    st.markdown(f"### Bienvenido(a), {st.session_state.nombre}")
+    # Contenido principal
+    st.title("🔍 Consulta Normativa")
+    st.markdown("Sistema de consulta especializado en normativa municipal de Zapopan")
     
-    # Inicializar historial si no existe
-    if "historial" not in st.session_state:
-        st.session_state.historial = []
+    # Mostrar resultado anterior si existe
+    if st.session_state.resultado_actual:
+        st.markdown("### 📄 Resultado de tu consulta anterior")
+        
+        if st.session_state.historial:
+            ultima_consulta = st.session_state.historial[-1]
+            st.markdown(f"**Tu consulta:** {ultima_consulta}")
+        
+        st.markdown(st.session_state.resultado_actual["texto_visible"])
+        
+        # Mostrar información técnica (solo para administrador_supremo)
+        if st.session_state.rol == "administrador_supremo":
+            with st.expander("Detalles técnicos (solo administrador)", expanded=False):
+                st.json({
+                    "categoria": st.session_state.resultado_actual["categoria"],
+                    "fuente": st.session_state.resultado_actual["fuente"],
+                    "usando_ai": st.session_state.resultado_actual["usando_ai"],
+                    "sigue_protocolo": st.session_state.resultado_actual["sigue_protocolo"],
+                    "timestamp": datetime.now().isoformat()
+                })
+        
+        st.markdown("---")
+        st.markdown("### ")
+        st.markdown("*Para nueva consulta, escribe abajo y haz clic en **Consultar***")
     
     # Área de consulta
     st.markdown("### Tu consulta")
     
-    # Usar text_input con key para manejar estado
     consulta = st.text_area(
         "Describe tu consulta sobre normativa de Zapopan:",
         value=st.session_state.get("consulta_actual", ""),
@@ -470,7 +460,7 @@ def main():
         if st.button("Consultar", type="primary", use_container_width=True):
             if consulta.strip():
                 with st.spinner("Procesando consulta..."):
-                    # Procesar con sistema local EXPANDIDO
+                    # Procesar con sistema local
                     resultado = procesar_consulta_local_expandida(consulta, st.session_state.usuario)
                     
                     # Guardar en historial
@@ -486,53 +476,15 @@ def main():
                 st.warning("Por favor ingresa una consulta")
     
     with col2:
-        if st.button("Limpiar", use_container_width=True):
+        if st.button("Limpiar", type="secondary", use_container_width=True):
             st.session_state.consulta_actual = ""
-            st.session_state.resultado_actual = None
             st.rerun()
     
-    # Mostrar resultado si existe
-    if st.session_state.get("resultado_actual"):
-        resultado = st.session_state.resultado_actual
-        
-        st.markdown("---")
-        st.markdown("### Resultado de la consulta")
-        
-        # Mostrar la consulta original del usuario
-        if st.session_state.historial:
-            ultima_consulta = st.session_state.historial[-1]
-            st.markdown(f"**Tu consulta:** {ultima_consulta}")
-        
-        # Mostrar respuesta
-        st.markdown(resultado["texto_visible"])
-        
-        # Mostrar información técnica (solo para administrador_supremo)
-        if st.session_state.rol == "administrador_supremo":
-            with st.expander("Detalles técnicos (solo administrador)", expanded=False):
-                st.json({
-                    "categoria": resultado["categoria"],
-                    "fuente": resultado["fuente"],
-                    "usando_ai": resultado["usando_ai"],
-                    "sigue_protocolo": resultado["sigue_protocolo"],
-                    "timestamp": datetime.now().isoformat()
-                })
-        
-        # Espacio limpio después del resultado
-        st.markdown("---")
-        st.markdown("### ")
-        st.markdown("*Para nueva consulta, escribe arriba y haz clic en **Consultar***")
-    
     # Si no hay resultado, mostrar espacio limpio
-    else:
+    if not st.session_state.resultado_actual:
         st.markdown("---")
         st.markdown("### ")
         st.markdown("*Escribe tu consulta arriba y haz clic en **Consultar***")
-
-# ============================================================================
-# IMPORTS SISTEMA LOCAL SIMPLE (EVITA ERRORES STREAMLIT CLOUD)
-# ============================================================================
-
-from procesador_simple import procesar_consulta_local_expandida
 
 # ============================================================================
 # EJECUCIÓN
