@@ -5,7 +5,7 @@ Sin errores de indentación, CSS externo via CDN
 
 import streamlit as st
 from datetime import datetime
-from procesador_simple import procesar_consulta_local_expandida
+from procesador_completo import procesar_consulta_local_expandida
 
 # ============================================================================
 # CONFIGURACIÓN
@@ -18,17 +18,126 @@ st.set_page_config(
 )
 
 # ============================================================================
-# SISTEMA DE DISEÑO RESONANT STARK 2026 (CSS EXTERNO VÍA CDN)
+# SISTEMA DE DISEÑO RESONANT STARK 2026 (CSS INLINE GARANTIZADO)
 # ============================================================================
 
-# CSS externo via GitHub Raw - Streamlit Cloud funciona mejor con esto
+# CSS INLINE COMPLETO - Garantizado que se carga en Streamlit Cloud
 st.markdown("""
-<link rel="stylesheet" href="https://raw.githubusercontent.com/luisag34/chatbot-zapopan/main/estilos_resonant_stark.css">
 <style>
-/* CSS mínimo de respaldo por si CDN falla */
-.stApp { background: #FFFFFF !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; }
-.stButton > button { background: #1D4ED8 !important; color: white !important; border-radius: 8px !important; }
-.stTextInput > div > div > input { border: 1px solid #E5E7EB !important; border-radius: 8px !important; }
+/* CSS RESONANT STARK INLINE - 100% garantizado */
+:root {
+  --rs-primary: #1D4ED8;
+  --rs-primary-hover: #1E40AF;
+  --rs-secondary: #0F172A;
+  --rs-surface: #F8FAFC;
+}
+
+/* FONDO Y TIPOGRAFÍA */
+.stApp {
+  background: #FFFFFF !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  line-height: 1.5 !important;
+  color: #0F172A !important;
+}
+
+/* HEADERS COMPACTOS */
+h1, .stMarkdown h1 {
+  font-size: 30px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  margin: 16px 0 8px 0 !important;
+  line-height: 1.2 !important;
+}
+
+h2, .stMarkdown h2 {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: #0F172A !important;
+  margin: 12px 0 8px 0 !important;
+  line-height: 1.3 !important;
+}
+
+h3, .stMarkdown h3 {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  color: #0F172A !important;
+  margin: 12px 0 4px 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* PÁRRAFOS COMPACTOS */
+p, .stMarkdown p {
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  margin: 8px 0 !important;
+  color: #374151 !important;
+}
+
+/* BOTONES AZULES CON SOMBRA */
+.stButton > button {
+  background: #1D4ED8 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 24px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.stButton > button:hover {
+  background: #1E40AF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* INPUTS ELEGANTES */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea {
+  background: white !important;
+  border: 1px solid #E5E7EB !important;
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  font-size: 16px !important;
+  color: #0F172A !important;
+  transition: all 0.2s ease !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+  border-color: #1D4ED8 !important;
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1) !important;
+  outline: none !important;
+}
+
+/* CONTAINERS LIMPIOS */
+.stContainer, .stExpander {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 16px 0 !important;
+}
+
+/* SIDEBAR */
+section[data-testid="stSidebar"] {
+  background: #F8FAFC !important;
+  border-right: 1px solid #E5E7EB !important;
+}
+
+section[data-testid="stSidebar"] > div {
+  padding: 24px !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  h1, .stMarkdown h1 { font-size: 24px !important; margin: 12px 0 8px 0 !important; }
+  h2, .stMarkdown h2 { font-size: 20px !important; margin: 8px 0 4px 0 !important; }
+  h3, .stMarkdown h3 { font-size: 18px !important; margin: 8px 0 4px 0 !important; }
+  .stButton > button { padding: 12px 16px !important; font-size: 14px !important; }
+  section[data-testid="stSidebar"] { width: 100% !important; max-width: 100% !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -210,11 +319,12 @@ def main():
     
     # Mostrar resultado anterior si existe
     if st.session_state.resultado_actual:
-        st.markdown("### 📄 Resultado de tu consulta anterior")
+        st.markdown("### 📄 Resultado de tu consulta")
         
         if st.session_state.historial:
             ultima_consulta = st.session_state.historial[-1]
-            st.markdown(f"**Tu consulta:** {ultima_consulta}")
+            st.markdown(f"**📝 Tu consulta:** {ultima_consulta}")
+            st.markdown("---")
         
         st.markdown(st.session_state.resultado_actual["texto_visible"])
         
@@ -263,7 +373,7 @@ def main():
                     # Limpiar texto de consulta después de procesar
                     st.session_state.consulta_actual = ""
                     
-                    # Forzar rerun para actualizar interfaz
+                    # Forzar rerun para actualizar interfaz y limpiar textarea
                     st.rerun()
             else:
                 st.warning("Por favor ingresa una consulta")
