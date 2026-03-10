@@ -38,17 +38,17 @@ st.markdown("""
   --color-alerta: #EF4444;
   --color-advertencia: #F59E0B;
   
-  /* ESCALA DE GRISES 2026 */
-  --gray-50: #F8FAFC;
-  --gray-100: #F1F5F9;
-  --gray-200: #E2E8F0;
-  --gray-300: #CBD5E1;
-  --gray-400: #94A3B8;
-  --gray-500: #64748B;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1E293B;
-  --gray-900: #0F172A;
+  /* ESCALA DE GRISES 2026 - OPTIMIZADA PARA CONTRASTE */
+  --gray-50: #FFFFFF;
+  --gray-100: #F9FAFB;
+  --gray-200: #F3F4F6;
+  --gray-300: #E5E7EB;
+  --gray-400: #D1D5DB;
+  --gray-500: #9CA3AF;
+  --gray-600: #6B7280;
+  --gray-700: #4B5563;
+  --gray-800: #374151;
+  --gray-900: #1F2937;
   
   /* GRADIENTES */
   --gradient-primary: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
@@ -90,22 +90,40 @@ st.markdown("""
   --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* RESET Y BASE */
+/* RESET Y BASE - OPTIMIZADO PARA LEGIBILIDAD */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: var(--font-sans); background: var(--color-fondo); color: var(--gray-200); min-height: 100vh; }
+body { 
+  font-family: var(--font-sans); 
+  background: var(--color-fondo); 
+  color: var(--gray-100);  /* Mejor contraste */
+  min-height: 100vh;
+  line-height: 1.6;  /* Mejor legibilidad */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 /* TÍTULOS CON GRADIENTE */
 h1, .stMarkdown h1 { 
   font-size: var(--text-3xl); 
   font-weight: 700; 
-  background: var(--gradient-primary); 
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
-  background-clip: text; 
-  margin-bottom: var(--space-4); 
+  color: var(--gray-50);  /* Blanco puro para mejor contraste */
+  margin-bottom: var(--space-6); 
+  line-height: 1.2;
 }
-h2, .stMarkdown h2 { font-size: var(--text-2xl); color: var(--gray-100); margin-bottom: var(--space-4); }
-h3, .stMarkdown h3 { font-size: var(--text-xl); color: var(--gray-200); margin-bottom: var(--space-4); }
+h2, .stMarkdown h2 { 
+  font-size: var(--text-2xl); 
+  color: var(--gray-100); 
+  margin-bottom: var(--space-5); 
+  font-weight: 600;
+  line-height: 1.3;
+}
+h3, .stMarkdown h3 { 
+  font-size: var(--text-xl); 
+  color: var(--gray-200); 
+  margin-bottom: var(--space-4); 
+  font-weight: 500;
+  line-height: 1.4;
+}
 
 /* BOTONES STREAMLIT */
 .stButton > button {
@@ -137,13 +155,13 @@ h3, .stMarkdown h3 { font-size: var(--text-xl); color: var(--gray-200); margin-b
   transform: translateY(-2px) !important;
 }
 
-/* INPUTS STREAMLIT */
+/* INPUTS STREAMLIT - SIN FONDO GRIS */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea {
-  background: var(--color-surface) !important;
-  border: 2px solid var(--gray-700) !important;
+  background: #FFFFFF !important;  /* FONDO BLANCO PURO */
+  border: 2px solid var(--gray-400) !important;
   border-radius: var(--radius-lg) !important;
-  color: var(--gray-200) !important;
+  color: var(--gray-900) !important;  /* TEXTO OSCURO */
   padding: var(--space-3) var(--space-4) !important;
   font-family: var(--font-sans) !important;
   font-size: var(--text-base) !important;
@@ -156,28 +174,27 @@ h3, .stMarkdown h3 { font-size: var(--text-xl); color: var(--gray-200); margin-b
   outline: none !important;
 }
 
-/* CONTAINERS Y CARDS */
+/* CONTAINERS Y CARDS - SIN FONDO GRIS */
 .stContainer, .stExpander, div[data-testid="stVerticalBlock"] > div {
-  background: rgba(30, 41, 59, 0.7) !important;
-  backdrop-filter: blur(10px);
+  background: transparent !important;  /* ELIMINADO fondo gris */
   border-radius: var(--radius-xl) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: none !important;  /* ELIMINADO borde con línea */
   padding: var(--space-6) !important;
   margin-bottom: var(--space-4) !important;
   transition: all var(--transition-base) !important;
 }
 .stContainer:hover, .stExpander:hover {
-  border-color: rgba(59, 130, 246, 0.3) !important;
   transform: translateY(-2px);
 }
 
-/* SIDEBAR */
+/* SIDEBAR - SIN FONDO GRIS */
 section[data-testid="stSidebar"] {
-  background: var(--color-fondo) !important;
-  border-right: 1px solid var(--gray-800) !important;
+  background: #FFFFFF !important;  /* FONDO BLANCO */
+  border-right: 1px solid var(--gray-300) !important;  /* BORDE CLARO */
 }
 section[data-testid="stSidebar"] > div {
   padding: var(--space-6) !important;
+  color: var(--gray-800) !important;  /* TEXTO OSCURO */
 }
 
 /* ALERTAS */
@@ -198,16 +215,16 @@ div[data-testid="stAlert"] > div { border-radius: var(--radius-lg) !important; }
 @media (prefers-color-scheme: light) {
   :root {
     --color-fondo: #FFFFFF;
-    --color-surface: #F8FAFC;
-    --gray-200: #1E293B;
-    --gray-300: #334155;
-    --gray-700: #94A3B8;
-    --gray-800: #64748B;
-    --gray-900: #475569;
+    --color-surface: #FFFFFF;
+    --gray-200: #374151;
+    --gray-300: #4B5563;
+    --gray-700: #6B7280;
+    --gray-800: #9CA3AF;
+    --gray-900: #D1D5DB;
   }
   .stContainer, .stExpander {
-    background: rgba(248, 250, 252, 0.9) !important;
-    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
   }
 }
 
@@ -301,27 +318,25 @@ def main():
         col1, col2, col3 = st.columns([1, 2, 1])
         
         with col2:
-            with st.container(border=True):
-                st.markdown("#### Iniciar Sesión")
-                
-                usuario = st.text_input("Usuario", placeholder="Ej: directora_inspeccion")
-                password = st.text_input("Contraseña", type="password", placeholder="Ej: Zapopan2026!DIV1")
-                
-                if st.button("Ingresar", type="primary", use_container_width=True):
-                    if verificar_login(usuario, password):
-                        st.session_state.autenticado = True
-                        st.session_state.usuario = usuario
-                        st.session_state.rol = obtener_rol(usuario)
-                        st.session_state.nombre = obtener_nombre(usuario)
-                        st.rerun()
-                    else:
-                        st.error("Usuario o contraseña incorrectos")
-                
-                st.markdown("---")
-                st.markdown("**Información de acceso:**")
-                st.markdown("- Sistema restringido al personal autorizado de la Dirección de Inspección y Vigilancia")
-                st.markdown("- Para solicitar acceso, contactar al administrador del sistema")
-                st.markdown("- Acceso mediante credenciales institucionales")
+            st.markdown("#### Iniciar Sesión")
+            
+            usuario = st.text_input("Usuario", placeholder="Ingresa tu usuario")
+            password = st.text_input("Contraseña", type="password", placeholder="Ingresa tu contraseña")
+            
+            if st.button("Ingresar", type="primary", use_container_width=True):
+                if verificar_login(usuario, password):
+                    st.session_state.autenticado = True
+                    st.session_state.usuario = usuario
+                    st.session_state.rol = obtener_rol(usuario)
+                    st.session_state.nombre = obtener_nombre(usuario)
+                    st.rerun()
+                else:
+                    st.error("Usuario o contraseña incorrectos")
+            
+            st.markdown("**Información de acceso:**")
+            st.markdown("- Sistema restringido al personal autorizado de la Dirección de Inspección y Vigilancia")
+            st.markdown("- Para solicitar acceso, contactar al administrador del sistema")
+            st.markdown("- Acceso mediante credenciales institucionales")
         
         return
     
@@ -337,13 +352,13 @@ def main():
         
         st.markdown("---")
         
-        # Botón Dashboard - SOLO para administrador_supremo
+        # Botón DASHBOARD - SOLO para administrador_supremo
         if st.session_state.rol == "administrador_supremo":
-            if st.button("Dashboard", use_container_width=True):
+            if st.button("DASHBOARD", use_container_width=True):
                 st.info("Funcionalidad de Dashboard en desarrollo")
         
-        # Botón App
-        if st.button("App", use_container_width=True):
+        # Botón APP
+        if st.button("APP", use_container_width=True):
             st.info("Aplicación principal activa")
         
         st.markdown("---")
@@ -396,8 +411,8 @@ def main():
         if st.button("Consultar", type="primary", use_container_width=True):
             if consulta.strip():
                 with st.spinner("Procesando consulta..."):
-                    # Procesar con sistema local
-                    resultado = procesar_consulta_local_protocolo_completo(consulta, st.session_state.usuario)
+                    # Procesar con sistema local EXPANDIDO
+                    resultado = procesar_consulta_local_expandida(consulta, st.session_state.usuario)
                     
                     # Guardar en historial
                     st.session_state.historial.append(consulta)
@@ -427,8 +442,7 @@ def main():
         # Mostrar la consulta original del usuario
         if st.session_state.historial:
             ultima_consulta = st.session_state.historial[-1]
-            with st.container(border=True):
-                st.markdown(f"**Tu consulta:** {ultima_consulta}")
+            st.markdown(f"**Tu consulta:** {ultima_consulta}")
         
         # Mostrar respuesta
         st.markdown(resultado["texto_visible"])
@@ -444,27 +458,22 @@ def main():
                     "timestamp": datetime.now().isoformat()
                 })
         
-        # Sección de consulta normativa DESPUÉS del resultado
+        # Espacio limpio después del resultado
         st.markdown("---")
-        st.markdown("### Consulta normativa")
-        st.markdown("¿Tienes otra consulta? Utiliza el campo de texto arriba para realizar una nueva consulta.")
+        st.markdown("### ")
+        st.markdown("*Para nueva consulta, escribe arriba y haz clic en **Consultar***")
     
-    # Si no hay resultado, mostrar instrucciones
+    # Si no hay resultado, mostrar espacio limpio
     else:
         st.markdown("---")
-        st.markdown("### Instrucciones de uso")
-        st.markdown("""
-        1. Escribe tu consulta en el campo de texto superior
-        2. Haz clic en **Consultar** para procesar tu solicitud
-        3. Revisa el resultado que aparecerá en esta sección
-        4. Para una nueva consulta, escribe en el campo de texto y haz clic en **Consultar** nuevamente
-        
-        **Ejemplos de consultas:**
-        - Requisitos para apertura de negocio
-        - Permisos para construcción
-        - Denuncia por ruido excesivo
-        - Consulta sobre uso de suelo
-        """)
+        st.markdown("### ")
+        st.markdown("*Escribe tu consulta arriba y haz clic en **Consultar***")
+
+# ============================================================================
+# IMPORTS SISTEMA LOCAL EXPANDIDO
+# ============================================================================
+
+from procesador_expandido import procesar_consulta_local_expandida
 
 # ============================================================================
 # EJECUCIÓN

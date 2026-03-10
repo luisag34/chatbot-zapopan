@@ -26,7 +26,8 @@ class SistemaLocalProtocoloCompleto:
     
     def _cargar_base_conocimiento(self) -> Dict:
         """Cargar base de conocimiento específica de Zapopan"""
-        return {
+        # Base original
+        base_original = {
             "antena": {
                 "titulo": "Instalación de antenas de celulares",
                 "analisis": """La instalación de una antena de telefonía celular en la azotea de un domicilio particular es una actividad regulada por la normativa estatal y municipal, clasificada jurídicamente como una "Obra Civil para Telecomunicaciones". Aunque los propietarios tienen derecho a utilizar sus azoteas, la colocación de este tipo de infraestructura no puede hacerse de manera arbitraria.
